@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
 Milestone: M1 Foundations (done condition met; awaiting Adam's play-test and /wrap)
-Next: Adam play-tests M1 with `pnpm dev`; on /wrap, start M2 with the question schema design in project.md §5
+Next: Adam re-tests the faster speeds; on /wrap, start M2 (schema must include explain, choices-required-for-blanks, strictAccents)
 Milestones since review: 0
 
 Tier: 3 System
@@ -24,6 +24,9 @@ speed and splice-in-loop bugs fixed, and `pnpm verify` is green.
   age 11 added (uses age-10 legacy questions).
 - Verify green: typecheck, lint, 28 tests (incl. REQ-PLAY-001 at 30–240 Hz), build.
   Browser-tested a full round end to end at desktop and phone sizes.
+- After Adam's play-test: speeds raised ~45% (config.ts). Plan updated: per-question
+  timer (REQ-PLAY-002), blanks must be choice (REQ-CONT-002), accent feedback
+  (REQ-ANS-001), learning loop in M4, new M14 bilingual mode, M6 moved after M2.
 
 ## Open questions
 
