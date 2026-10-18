@@ -6,6 +6,7 @@
  */
 import type { Rng } from '../engine/rng';
 import { mark, type Answer, type Question } from '../game/questions';
+import { OrderingPicker } from './ordering';
 
 /** Under this share of the time left, the bar turns to its warning colour. */
 const WARN_SHARE = 0.25;
@@ -47,6 +48,7 @@ export class QuestionCard {
   /** Option buttons with the Answer each gives, for keys and the reveal. */
   private options: { button: HTMLButtonElement; answer: Answer; key: string }[] = [];
   private input: HTMLInputElement | undefined;
+  private ordering: OrderingPicker | undefined;
 
   constructor(
     form: HTMLFormElement,
@@ -67,9 +69,15 @@ export class QuestionCard {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (this.input && this.input.value.trim() !== '') this.submit({ type: 'typed', text: this.input.value });
+      const order = this.ordering?.order;
+      if (order) this.submit({ type: 'ordering', order });
     });
     window.addEventListener('keydown', (e) => {
       if (this.locked || e.target instanceof HTMLInputElement) return;
+      if (this.ordering) {
+        this.orderingKey(e, this.ordering);
+        return;
+      }
       const option = this.options.find((o) => o.key === e.key.toLowerCase() || o.key === e.key);
       if (option) {
         e.preventDefault();
@@ -92,6 +100,7 @@ export class QuestionCard {
     this.answers.dataset['type'] = question.type;
     this.options = [];
     this.input = undefined;
+    this.ordering = undefined;
 
     switch (question.type) {
       case 'choice':
@@ -115,16 +124,23 @@ export class QuestionCard {
         this.input = input;
         break;
       }
-      case 'ordering':
-        // Ordering's tap-in-order card arrives in M4 4c; the picker excludes it until then.
-        throw new Error('Ordering questions have no card yet');
+      case 'ordering': {
+        const check = button('btn', 'Check');
+        check.type = 'submit';
+        this.ordering = new OrderingPicker(question.answer, rng, (full) => {
+          check.disabled = !full;
+        });
+        this.answers.append(this.ordering.element, check);
+        break;
+      }
     }
     this.drawTimer();
   }
 
   /** Focus the first control once the card is visible. */
   focus(): void {
-    (this.input ?? this.options[0]?.button)?.focus();
+    if (this.ordering) this.ordering.focus();
+    else (this.input ?? this.options[0]?.button)?.focus();
   }
 
   /** Advances the question clock by `dt` game-time seconds; times out at the limit. */
@@ -146,6 +162,17 @@ export class QuestionCard {
       else if (option.answer === given) option.button.dataset['result'] = 'bad';
     }
     if (this.input) this.input.dataset['result'] = right ? 'good' : 'bad';
+    if (this.ordering && question.type === 'ordering') this.ordering.reveal(question.answer);
+  }
+
+  /** Keys 1–6 place tiles, Backspace takes the last one back, Enter checks once full. */
+  private orderingKey(e: KeyboardEvent, ordering: OrderingPicker): void {
+    const n = Number(e.key);
+    if (Number.isInteger(n) && n >= 1) ordering.pick(n - 1);
+    else if (e.key === 'Backspace') ordering.removeLast();
+    else if (e.key === 'Enter' && ordering.order) this.submit({ type: 'ordering', order: ordering.order });
+    else return;
+    e.preventDefault();
   }
 
   private addOption(label: string, answer: Answer, key: string): void {
@@ -163,6 +190,7 @@ export class QuestionCard {
     this.locked = true;
     for (const option of this.options) option.button.disabled = true;
     if (this.input) this.input.disabled = true;
+    this.ordering?.disable();
     this.answers.querySelector<HTMLButtonElement>('button[type=submit]')?.setAttribute('disabled', '');
     this.onSubmit({ answer, seconds: this.seconds });
   }

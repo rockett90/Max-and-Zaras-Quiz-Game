@@ -4,7 +4,6 @@
  * (./arithmetic.ts).
  *
  * Marking takes an `Answer` shaped by the card that collected it (src/ui/card.ts).
- * Ordering questions stay out of play until their card arrives in M4 4c.
  */
 import bank from 'virtual:questions';
 import type { Rng } from '../engine/rng';
@@ -16,8 +15,8 @@ import { normaliseAnswer } from './text';
 export { normaliseAnswer };
 export type { Question };
 
-/** Bank questions with a card to show them on. */
-export const PLAYABLE: readonly Question[] = bank.filter((q) => q.type !== 'ordering');
+/** Every bank question; each type has a card to show it on. */
+export const PLAYABLE: readonly Question[] = bank;
 
 /** Age gaps outweigh level gaps when the bank has nothing exact. */
 const AGE_WEIGHT = 10;

@@ -176,7 +176,7 @@ kbd {
 }
 
 .card {
-  width: 640px;
+  width: 720px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -268,6 +268,93 @@ kbd {
 .card__option[data-result='bad'] {
   border-color: var(--bad);
   background: var(--bad);
+}
+
+.card__answers[data-type='ordering'] {
+  flex-direction: column;
+  align-items: center;
+}
+
+.ordering {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.ordering__slots,
+.ordering__pool {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ordering__slot {
+  position: relative;
+  min-width: 96px;
+  min-height: 60px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 24px;
+  font-weight: bold;
+  border: 3px dashed rgb(18 48 74 / 0.35);
+  border-radius: 16px;
+  background: rgb(18 48 74 / 0.05);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* The place number, shown inside an empty slot and small in the corner once filled */
+.ordering__slot::before {
+  content: attr(data-n);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgb(18 48 74 / 0.3);
+}
+
+.ordering__slot[data-filled] {
+  border-style: solid;
+  border-color: var(--sea);
+  background: #eaf6ff;
+}
+
+.ordering__slot[data-filled]::before {
+  inset: 2px auto auto 6px;
+  display: block;
+  font-size: 12px;
+}
+
+.ordering__slot[data-result='good'] {
+  border-color: var(--good);
+  background: var(--good);
+  color: #fff;
+}
+
+.ordering__slot[data-result='bad'] {
+  border-color: var(--bad);
+  background: var(--bad);
+  color: #fff;
+}
+
+.ordering__tile {
+  min-width: 96px;
+  min-height: 60px;
+  padding: 8px 12px;
+  font-size: 24px;
+  border-width: 3px;
+}
+
+.ordering__tile .card__key {
+  top: 2px;
+  left: 6px;
+  font-size: 12px;
+}
+
+.ordering__tile[data-placed] {
+  opacity: 0.25;
 }
 
 /* Keyboard hint; hidden on touch-only screens where it would only confuse */
