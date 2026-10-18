@@ -416,6 +416,70 @@ kbd {
   font-size: 28px;
 }
 
+.review {
+  width: 680px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 14px 24px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.75);
+  text-align: left;
+}
+
+.review__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review__item {
+  padding-left: 14px;
+  border-left: 5px solid var(--bad);
+}
+
+.review__item[data-recovered] {
+  border-left-color: var(--good);
+}
+
+.review__item p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.review__prompt {
+  font-size: 22px;
+}
+
+.review__answer {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.review__item[data-recovered] .review__answer {
+  color: var(--good);
+}
+
+.review__explain {
+  font-size: 18px;
+  color: rgb(18 48 74 / 0.75);
+}
+
+/* With a review to show, tighten the results screen and drop the decorative logo */
+#screen-results:has(.review:not([hidden])) {
+  gap: 14px;
+}
+
+#screen-results:has(.review:not([hidden])) .logo {
+  display: none;
+}
+
+#screen-results:has(.review:not([hidden])) .results-star {
+  font-size: 72px;
+}
+
 .results-stars {
   display: flex;
   gap: 12px;

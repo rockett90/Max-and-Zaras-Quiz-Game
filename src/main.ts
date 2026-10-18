@@ -14,6 +14,7 @@ import { ReaskQueue, type Missed } from './game/reask';
 import { RETRY_SHARE, RoundScore, timeLimitFor } from './game/scoring';
 import { World } from './game/world';
 import { QuestionCard, type Submission } from './ui/card';
+import { renderReview } from './ui/review';
 
 import backgroundUrl from './assets/background.png';
 import boxUrl from './assets/box1.png';
@@ -174,6 +175,7 @@ async function main(): Promise<void> {
         ? 'Pop a box with a bubble to get a question!'
         : `${round.correct} of ${round.answered} right` +
           (round.bestStreak >= 3 ? ` · best streak ${round.bestStreak}` : '');
+    renderReview(el('results-review'), reask.missed);
     show('results');
   };
 
