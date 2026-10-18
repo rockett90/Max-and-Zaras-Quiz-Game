@@ -5,9 +5,48 @@ new one ("DEC-007 supersedes DEC-003 …"). Grep the index, then read single ent
 
 ## Index
 
+- DEC-004 · 2026-10-18 · M3 Maths generators — symbol-only sums per age × level, 50/50 with bank numeracy, choice for ages 4–5
 - DEC-003 · 2026-10-18 · M6 Game feel — streak scoring, stars, parallax, box tints, particles; own RNG for effects
 - DEC-002 · 2026-10-18 · M2 Question schema — YAML bank, validator, drafts excluded from production
 - DEC-001 · 2026-10-18 · M1 Foundations — Vite + TS rebuild, Cloudflare hosting, speed tuning
+
+---
+
+## DEC-004 · 2026-10-18 · M3 Procedural maths generators
+
+**Built:** `src/game/arithmetic.ts`, holding a curriculum table for every age 4–11 ×
+level 1–3 after the UK bands. Its recipes cover add, sub, times tables, exact
+division, missing number, order of operations, negatives and squares.
+`generateSum` returns structured `{op, operands, answer, prompt, working}`, and
+`generateQuestion` wraps that as a `Question`. `pickQuestion` gained a
+`generatedShare` parameter, default `GENERATED_SHARE = 0.5`.
+`tests/arithmetic.test.ts` holds its own limits table, independent of the
+curriculum, and checks each cell's op set, answer range and operand range over 500
+seeds. It also evaluates every prompt and working line with the answer filled in,
+and checks exact division and same-seed replay. Committed as bb44de3. Verify
+green: 132 tests, build.
+
+**Decided:**
+- Symbols only (`7 + 5 = ?`, `? − 3 = 4`, explanation `7 + 5 = 12`), so one
+  generator serves all five languages. The missing number is `?`, not `__`, which
+  REQ-CONT-002 reserves for choice questions.
+- Half of numeracy picks are generated (Adam). Numeracy is always offered while the
+  share is above 0, so a production build with an all-draft bank still has sums.
+- Ages ≤5 (`CHOICE_MAX_AGE`) get multiple choice: the answer plus two near misses
+  within ±2, never negative (Adam). Older ages type the answer. Negative answers
+  also accept the typographic minus.
+- Generated questions are `status: reviewed`, because the code is the reviewed
+  source.
+- Rejected: word problems in the generator. They stay hand-written in YAML (M10).
+
+**Deviations:** none from the approved plan.
+
+**Follow-ups:**
+- Romanian (and some other European languages) writes ÷ as `:` and × as `·`.
+  Add a per-language symbol map when es/ro content arrives (M11).
+- Age 4 L3 can produce trivial sums like `1 − 1`. Retune after play-testing.
+- Older ages still draw thin bank numeracy half the time (e.g. `6, __, 10` at
+  age 10). M10 content fixes that, or raise the share.
 
 ---
 
