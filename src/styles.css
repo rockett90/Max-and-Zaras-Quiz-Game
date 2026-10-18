@@ -176,6 +176,7 @@ kbd {
 }
 
 .card {
+  position: relative;
   width: 720px;
   display: flex;
   flex-direction: column;
@@ -185,6 +186,40 @@ kbd {
   border-radius: 28px;
   background: var(--card);
   box-shadow: 0 10px 40px rgb(0 0 0 / 0.35);
+}
+
+.card__speak {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+  border: 3px solid var(--sea);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+.card__speak:hover {
+  background: #eaf6ff;
+}
+
+.card__speak[data-speaking] {
+  background: var(--sea-light);
+  animation: speak-pulse 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes speak-pulse {
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card__speak[data-speaking] {
+    animation: none;
+  }
 }
 
 .card__level {

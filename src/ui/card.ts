@@ -4,9 +4,11 @@
  * `tick`), and hands back an Answer — or nothing when time runs out. Marking and
  * scoring stay with the caller; the card only shows the result it is told. After a
  * right answer it moves on by itself; after a miss it waits for Continue, so there
- * is time to read the explanation.
+ * is time to read the explanation. The 🔊 button reads the question and its
+ * options aloud, and the clock stops while it does (REQ-PLAY-003).
  */
 import type { Rng } from '../engine/rng';
+import type { Speech } from '../engine/speech';
 import { mark, type Answer, type Question } from '../game/questions';
 import { OrderingPicker } from './ordering';
 
@@ -46,13 +48,14 @@ export class QuestionCard {
   private readonly answers: HTMLElement;
   private readonly feedback: HTMLElement;
   private readonly continueButton: HTMLElement;
+  private readonly speakButton: HTMLButtonElement;
 
   private question: Question | undefined;
   private limit = 0;
   private seconds = 0;
   private locked = true;
   /** Option buttons with the Answer each gives, for keys and the reveal. */
-  private options: { button: HTMLButtonElement; answer: Answer; key: string }[] = [];
+  private options: { button: HTMLButtonElement; answer: Answer; key: string; label: string }[] = [];
   private input: HTMLInputElement | undefined;
   private ordering: OrderingPicker | undefined;
   /** Seconds left before a right answer moves on; undefined when not counting. */
@@ -63,6 +66,7 @@ export class QuestionCard {
     form: HTMLFormElement,
     private readonly onSubmit: (submission: Submission) => void,
     private readonly onContinue: () => void,
+    private readonly speech: Speech,
   ) {
     const part = (selector: string): HTMLElement => {
       const found = form.querySelector<HTMLElement>(selector);
@@ -77,6 +81,9 @@ export class QuestionCard {
     this.feedback = part('.card__feedback');
     this.continueButton = part('.card__continue');
     this.continueButton.addEventListener('click', () => this.finish());
+    this.speakButton = part('.card__speak') as HTMLButtonElement;
+    this.speakButton.addEventListener('click', () => this.readAloud());
+    speech.onVoicesChanged(() => this.updateSpeakButton());
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -121,6 +128,7 @@ export class QuestionCard {
     this.hold = undefined;
     this.awaitingContinue = false;
     this.continueButton.hidden = true;
+    this.speech.cancel();
 
     switch (question.type) {
       case 'choice':
@@ -154,6 +162,7 @@ export class QuestionCard {
         break;
       }
     }
+    this.updateSpeakButton();
     this.drawTimer();
   }
 
@@ -163,13 +172,17 @@ export class QuestionCard {
     else (this.input ?? this.options[0]?.button)?.focus();
   }
 
-  /** Advances the question clock by `dt` game-time seconds; times out at the limit. */
+  /**
+   * Advances the question clock by `dt` game-time seconds; times out at the limit.
+   * The clock stands still while the question is being read aloud.
+   */
   tick(dt: number): void {
     if (this.hold !== undefined) {
       this.hold -= dt;
       if (this.hold <= 0) this.finish();
     }
-    if (this.locked) return;
+    this.speakButton.toggleAttribute('data-speaking', this.speech.speaking);
+    if (this.locked || this.speech.speaking) return;
     this.seconds = Math.min(this.seconds + dt, this.limit);
     this.drawTimer();
     if (this.seconds >= this.limit) this.lock(undefined);
@@ -198,6 +211,21 @@ export class QuestionCard {
     }
   }
 
+  /** The question and its options as one sentence to speak, in the order shown. */
+  private spokenText(question: Question): string {
+    const prompt = question.prompt.replaceAll('__', '…');
+    const labels = this.ordering ? this.ordering.items : this.options.map((o) => o.label);
+    return labels.length > 0 ? `${prompt} ${labels.join(', ')}?` : prompt;
+  }
+
+  private readAloud(): void {
+    if (this.question && !this.locked) this.speech.speak(this.spokenText(this.question), this.question.language);
+  }
+
+  private updateSpeakButton(): void {
+    this.speakButton.hidden = !this.question || !this.speech.canSpeak(this.question.language);
+  }
+
   private finish(): void {
     this.hold = undefined;
     this.awaitingContinue = false;
@@ -219,7 +247,7 @@ export class QuestionCard {
     const b = button('card__option', label, key.toUpperCase());
     b.addEventListener('click', () => this.submit(answer));
     this.answers.append(b);
-    this.options.push({ button: b, answer, key });
+    this.options.push({ button: b, answer, key, label });
   }
 
   private submit(answer: Answer): void {
@@ -228,6 +256,7 @@ export class QuestionCard {
 
   private lock(answer: Answer | undefined): void {
     this.locked = true;
+    this.speech.cancel();
     for (const option of this.options) option.button.disabled = true;
     if (this.input) this.input.disabled = true;
     this.ordering?.disable();

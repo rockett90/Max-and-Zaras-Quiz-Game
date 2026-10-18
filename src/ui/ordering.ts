@@ -111,6 +111,11 @@ export class OrderingPicker {
     this.draw();
   }
 
+  /** The tiles in the order they are shown. */
+  get items(): readonly string[] {
+    return this.model.pool;
+  }
+
   get order(): string[] | undefined {
     return this.model.order;
   }

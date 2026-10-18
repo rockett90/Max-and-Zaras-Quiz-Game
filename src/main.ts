@@ -3,6 +3,7 @@ import { loadImages, Music, Sound, type ImageSet } from './engine/assets';
 import { Keyboard } from './engine/input';
 import { startLoop } from './engine/loop';
 import { randomSeed, Rng } from './engine/rng';
+import { Speech } from './engine/speech';
 import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
 import { answerText, mark, pickQuestion, PLAYABLE, type Question } from './game/questions';
@@ -60,6 +61,7 @@ async function main(): Promise<void> {
   const art: Art = { images, scenery: buildScenery(images.background), boxes: buildBoxArt(images.box) };
   const music = new Music(musicUrl, 0.4);
   const sfx = { jump: new Sound(jumpSfxUrl, 0.7), bubble: new Sound(bubbleSfxUrl, 0.7) };
+  const speech = new Speech();
   const keys = new Keyboard(window, new Set(['ArrowRight', 'ArrowUp', 'Space']));
 
   let age: number | undefined;
@@ -114,10 +116,15 @@ async function main(): Promise<void> {
     card.showResult(message, right, answer);
     current = undefined;
   };
-  const card = new QuestionCard(el<HTMLFormElement>('question-form'), onSubmit, () => {
-    show();
-    playing = true;
-  });
+  const card = new QuestionCard(
+    el<HTMLFormElement>('question-form'),
+    onSubmit,
+    () => {
+      show();
+      playing = true;
+    },
+    speech,
+  );
 
   // Dev builds only: ?type=true-false (etc.) asks only that type, to test each card.
   const devType = import.meta.env.DEV ? new URLSearchParams(location.search).get('type') : null;
@@ -180,7 +187,10 @@ async function main(): Promise<void> {
   };
 
   el('splash-continue').addEventListener('click', () => show('setup'));
-  startButton.addEventListener('click', startRound);
+  startButton.addEventListener('click', () => {
+    speech.unlock(); // iOS speaks only after a tap has started speech once
+    startRound();
+  });
   el('results-again').addEventListener('click', () => show('setup'));
 
   document.addEventListener('visibilitychange', () => {
