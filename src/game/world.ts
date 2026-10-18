@@ -30,7 +30,12 @@ export interface Intent {
   fire: boolean;
 }
 
-export type WorldEvent = { type: 'jumped' } | { type: 'fired' } | { type: 'boxHit'; level: Level } | { type: 'timeUp' };
+export type WorldEvent =
+  | { type: 'jumped' }
+  | { type: 'landed'; x: number; y: number }
+  | { type: 'fired' }
+  | { type: 'boxHit'; level: Level; x: number; y: number }
+  | { type: 'timeUp' };
 
 /**
  * The whole simulation. Advances only through `update(dt)` on game time, so pausing
@@ -71,7 +76,7 @@ export class World {
       events.push({ type: 'fired' });
     }
 
-    this.updateCrab(dt);
+    this.updateCrab(dt, events);
 
     const blocked = this.obstacles.some((ob) => rectsOverlap(this.crab, ob));
     if (intent.moveRight && !blocked) {
@@ -88,7 +93,7 @@ export class World {
     return events;
   }
 
-  private updateCrab(dt: number): void {
+  private updateCrab(dt: number, events: WorldEvent[]): void {
     const crab = this.crab;
     if (!crab.airborne) return;
     crab.vy += CRAB.gravity * dt;
@@ -97,6 +102,7 @@ export class World {
       crab.y = GROUND_Y;
       crab.vy = 0;
       crab.airborne = false;
+      events.push({ type: 'landed', x: crab.x + crab.width / 2, y: crab.y + crab.height });
     }
   }
 
@@ -130,7 +136,9 @@ export class World {
       const hit = this.boxes.findIndex((box) => circleHitsRect(bubble.x, bubble.y, bubble.radius, box));
       if (hit >= 0) {
         const [box] = this.boxes.splice(hit, 1);
-        if (box) events.push({ type: 'boxHit', level: box.level });
+        if (box) {
+          events.push({ type: 'boxHit', level: box.level, x: box.x + box.width / 2, y: box.y + box.height / 2 });
+        }
         continue;
       }
       if (bubble.y + bubble.radius > 0) survivors.push(bubble);

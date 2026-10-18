@@ -1,6 +1,7 @@
 import type { ImageSet } from '../engine/assets';
 import { drawBox, type BoxArt } from './boxArt';
 import { WORLD_WIDTH } from './config';
+import type { Effects } from './effects';
 import { drawScenery, type Scenery } from './scenery';
 import type { RoundScore } from './scoring';
 import type { World } from './world';
@@ -16,9 +17,16 @@ export interface Art {
   boxes: BoxArt;
 }
 
-export function renderWorld(ctx: CanvasRenderingContext2D, world: World, round: RoundScore, art: Art): void {
+export function renderWorld(
+  ctx: CanvasRenderingContext2D,
+  world: World,
+  round: RoundScore,
+  effects: Effects,
+  art: Art,
+): void {
   const { images } = art;
   drawScenery(ctx, art.scenery, world.distance, world.elapsed);
+  effects.drawPlankton(ctx, world);
 
   for (const ob of world.obstacles) {
     ctx.drawImage(images[ob.kind], ob.x, ob.y, ob.width, ob.height);
@@ -33,6 +41,7 @@ export function renderWorld(ctx: CanvasRenderingContext2D, world: World, round: 
     ctx.drawImage(images.bubble, b.x - b.radius, b.y - b.radius, b.radius * 2, b.radius * 2);
   }
 
+  effects.drawParticles(ctx);
   drawHud(ctx, world, round);
 }
 

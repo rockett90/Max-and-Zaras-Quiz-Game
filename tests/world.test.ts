@@ -27,11 +27,13 @@ describe('World', () => {
     expect(world.update(DT, { ...idle, jump: true })).toContainEqual({ type: 'jumped' });
     expect(world.update(DT, { ...idle, jump: true })).not.toContainEqual({ type: 'jumped' }); // mid-air
     let peak = GROUND_Y;
+    const events: WorldEvent[] = [];
     for (let i = 0; i < 180; i++) {
-      world.update(DT, idle);
+      events.push(...world.update(DT, idle));
       peak = Math.min(peak, world.crab.y);
     }
     expect(peak).toBeLessThan(GROUND_Y - 300);
+    expect(events.filter((e) => e.type === 'landed')).toHaveLength(1);
     expect(world.crab.y).toBe(GROUND_Y);
     expect(world.crab.airborne).toBe(false);
   });
@@ -74,7 +76,9 @@ describe('World', () => {
     world.boxes.push({ level: 3, x: bx, y: 300, width: BOXES.size, height: BOXES.size });
     world.boxes.push({ level: 1, x: bx + 400, y: 300, width: BOXES.size, height: BOXES.size });
     const events = [...world.update(DT, { ...idle, fire: true }), ...run(world, 2)];
-    expect(events.filter((e) => e.type === 'boxHit')).toEqual([{ type: 'boxHit', level: 3 }]);
+    expect(events.filter((e) => e.type === 'boxHit')).toEqual([
+      { type: 'boxHit', level: 3, x: bx + BOXES.size / 2, y: 300 + BOXES.size / 2 },
+    ]);
     expect(world.boxes.map((b) => b.level)).toEqual([1]);
     expect(world.bubbles).toHaveLength(0);
   });

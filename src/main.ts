@@ -7,6 +7,7 @@ import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
 import { answerText, cardText, isCorrect, pickQuestion, type Question } from './game/questions';
 import { buildBoxArt } from './game/boxArt';
+import { Effects } from './game/effects';
 import { renderWorld, type Art, type ImageKey } from './game/render';
 import { buildScenery } from './game/scenery';
 import { RoundScore } from './game/scoring';
@@ -63,6 +64,10 @@ async function main(): Promise<void> {
   let rng = new Rng(randomSeed());
   let world = new World(rng);
   let round = new RoundScore();
+  // Effects get their own RNG so they never shift what the round's RNG draws next.
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const newEffects = (): Effects => new Effects(new Rng(randomSeed()), reducedMotion.matches);
+  let effects = newEffects();
   let playing = false;
 
   // --- Setup screen -------------------------------------------------------
@@ -88,12 +93,13 @@ async function main(): Promise<void> {
   const questionText = el('question-text');
   const answerInput = el<HTMLInputElement>('question-answer');
   const feedback = el('question-feedback');
-  let current: { question: Question; level: Level } | undefined;
+  /** The open question, and where its box was popped. */
+  let current: { question: Question; level: Level; x: number; y: number } | undefined;
 
-  const askQuestion = (level: Level): void => {
+  const askQuestion = (level: Level, x: number, y: number): void => {
     const question = age === undefined ? undefined : pickQuestion(age, level, rng);
     if (!question) return; // nothing for this age/level yet; keep playing
-    current = { question, level };
+    current = { question, level, x, y };
     playing = false;
     keys.clear();
     const boost = round.nextMultiplier > 1 ? `  — streak ×${round.nextMultiplier}!` : '';
@@ -115,6 +121,7 @@ async function main(): Promise<void> {
     const right = isCorrect(question, answerInput.value);
     const result = round.answer(level, right);
     if (right) {
+      effects.celebrate(current.x, current.y, result.points, result.streak);
       const inARow = result.streak >= 3 ? ` — ${result.streak} in a row!` : '';
       feedback.textContent = `Correct! +${result.points}${inARow}`;
       feedback.dataset['result'] = 'good';
@@ -134,6 +141,7 @@ async function main(): Promise<void> {
     rng = new Rng(randomSeed());
     world = new World(rng);
     round = new RoundScore();
+    effects = newEffects();
     keys.clear();
     show();
     music.start();
@@ -181,14 +189,16 @@ async function main(): Promise<void> {
         jump: keys.consume('Space'),
         fire: keys.consume('ArrowUp'),
       });
+      effects.update(dt, world);
       for (const event of events) {
+        effects.handle(event);
         if (event.type === 'jumped') sfx.jump.play();
         else if (event.type === 'fired') sfx.bubble.play();
-        else if (event.type === 'boxHit') askQuestion(event.level);
-        else endRound();
+        else if (event.type === 'boxHit') askQuestion(event.level, event.x, event.y);
+        else if (event.type === 'timeUp') endRound();
       }
     },
-    () => renderWorld(ctx, world, round, art),
+    () => renderWorld(ctx, world, round, effects, art),
   );
 
   show('splash');
