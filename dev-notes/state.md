@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
-Milestone: M6 Game feel (in progress, 6a done)
-Next: 6b parallax. Push/PR of `v2/m1-foundations` is on hold (Adam, 2026-10-18).
+Milestone: M6 Game feel (in progress, 6a–6b done)
+Next: 6c box per level. Push/PR of `v2/m1-foundations` is on hold (Adam, 2026-10-18).
 Milestones since review: 2
 
 Tier: 3 System
@@ -16,8 +16,9 @@ difference. Build order: M1 → M2 → M6 → M3 → M4 → …
 M6 plan (approved 2026-10-18). Work inline; every step touches `render.ts`.
 - [x] 6a `src/game/scoring.ts`: streak ×1.5 from 3, ×2 from 5; stars ★ any right,
   ★★ ≥60% and ≥4 answered, ★★★ ≥85% and ≥6. HUD streak pill, results stars.
-- [ ] 6b Parallax: background split at the sand line and mirror-tiled (water 0.2×,
-  sand 1×), a code-drawn reef silhouette at 0.45×, light-ray shimmer. File untouched.
+- [x] 6b `src/engine/parallax.ts` + `src/game/scenery.ts`: background mirror-tiled
+  and split at y=645 (water 0.2×, sand 1× with water pixels keyed out), code-drawn
+  reefs at 0.3× and 0.45×, light beams breathing on `world.elapsed`. File untouched.
 - [ ] 6c Box per level: tinted copies of box1 made at load (wood / sea-green + shell /
   gold + shimmer), and 1–3 star pips replace the number.
 - [ ] 6d `src/engine/particles.ts` with its own cosmetic RNG (never the round RNG;

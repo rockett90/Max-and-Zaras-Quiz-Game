@@ -44,6 +44,8 @@ export class World {
   timeLeft = ROUND_SECONDS;
   /** Total distance scrolled, for parallax backgrounds. */
   distance = 0;
+  /** Game seconds since the round began, for scenery animation. */
+  elapsed = 0;
   finished = false;
 
   constructor(private readonly rng: Rng) {}
@@ -52,6 +54,7 @@ export class World {
     if (this.finished) return [];
     const events: WorldEvent[] = [];
 
+    this.elapsed += dt;
     this.timeLeft = Math.max(0, this.timeLeft - dt);
     if (this.timeLeft === 0) {
       this.finished = true;

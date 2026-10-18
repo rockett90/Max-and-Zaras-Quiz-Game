@@ -1,5 +1,6 @@
 import type { ImageSet } from '../engine/assets';
-import { WORLD_HEIGHT, WORLD_WIDTH } from './config';
+import { WORLD_WIDTH } from './config';
+import { drawScenery, type Scenery } from './scenery';
 import type { RoundScore } from './scoring';
 import type { World } from './world';
 
@@ -12,8 +13,9 @@ export function renderWorld(
   world: World,
   round: RoundScore,
   images: ImageSet<ImageKey>,
+  scenery: Scenery,
 ): void {
-  ctx.drawImage(images.background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+  drawScenery(ctx, scenery, world.distance, world.elapsed);
 
   for (const ob of world.obstacles) {
     ctx.drawImage(images[ob.kind], ob.x, ob.y, ob.width, ob.height);
