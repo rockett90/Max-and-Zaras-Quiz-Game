@@ -5,8 +5,50 @@ new one ("DEC-007 supersedes DEC-003 …"). Grep the index, then read single ent
 
 ## Index
 
+- DEC-003 · 2026-10-18 · M6 Game feel — streak scoring, stars, parallax, box tints, particles; own RNG for effects
 - DEC-002 · 2026-10-18 · M2 Question schema — YAML bank, validator, drafts excluded from production
 - DEC-001 · 2026-10-18 · M1 Foundations — Vite + TS rebuild, Cloudflare hosting, speed tuning
+
+---
+
+## DEC-003 · 2026-10-18 · M6 Game feel
+
+**Built:** `src/game/scoring.ts` (pure): level × 10 points, streak ×1.5 from 3 in a
+row and ×2 from 5, stars from accuracy (★ any right; ★★ ≥60% with ≥4 answered;
+★★★ ≥85% with ≥6). HUD streak pill; results screen with animated stars and a tally.
+`src/engine/parallax.ts` + `src/game/scenery.ts`: background.png mirror-tiled and
+split at y=645 when drawn (water 0.2×, sand 1× with water keyed out), two
+code-drawn reef silhouettes (0.3×, 0.45×), light beams breathing on `World.elapsed`.
+`src/game/boxArt.ts`: three tinted copies of box1 made at load (wood, sea-green with
+a code-drawn shell, amber-gold with a shimmer) and 1–3 star pips instead of numbers.
+`src/engine/particles.ts` + `src/game/effects.ts`: box splinters and bubbles, bubble
+trail, landing puff, sparkles and "+N", plankton. Adam play-tested side-by-side
+against the M1 build (33e2441) and signed it off. Verify green: 78 tests, build.
+
+**Decided:**
+- Box variants are tints and overlays in code, not new drawings (Adam's choice); no
+  asset file is edited, keeping the personal-art invariant.
+- Effects run on a separate RNG per round, never the round RNG. If they shared it,
+  the number of bursts would change which boxes and questions follow, breaking the
+  reproducible Daily Challenge. Effects still advance only in `update(dt)`.
+- Scoring is pure and out of `main.ts` so M8's score-plausibility ceiling can be
+  derived from the same rules.
+- Reduced motion scales particles to 35% but always shows the "+N" (information).
+- A perfect 3 of 3 earns only ★ (the ★★ minimum is 4 answered). Kept; revisit when
+  the children play.
+
+**Deviations:** a second, fainter reef layer was added in 6b for depth (plan had one).
+
+**Dead-ends:**
+- Single-pass reef paths (quadratic mounds, pointed kelp) read as spires; rebuilt as
+  overlapping half-ellipses and round-tipped blades in one `Path2D` so overlaps fill once.
+- Drawing tiled copies at fractional x left a hairline seam; copies now overlap 1 px.
+- Multiply alone left level 2 murky and stars vanished on a screen-brightened gold;
+  multiply + a light screen pass, cut back with `destination-in`, fixed both.
+- New `landed` event hit `main.ts`'s catch-all `else endRound()`; event handling now
+  names `timeUp` explicitly. Exhaustive event checks belong in any new handler.
+- The built-in browser pane throttles rAF to ~2 fps, so the game clock looks slow
+  there. Not a game bug (no long animation frames measured).
 
 ---
 

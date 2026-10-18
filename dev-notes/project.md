@@ -48,7 +48,7 @@ translation questions between a child's languages.
 | M3 | Procedural maths generators per age/level | Tests prove every generator's output range by age and level | |
 | M4 | Question card: choice, true/false, typed, ordering; per-question timer with speed bonus; explanations, second chance, end-of-round review; read-aloud | Playable round exercising every answer type | |
 | M5 | Menus + touch: language → nickname → age → subjects → play; translated UI strings | Full flow on a tablet-sized viewport, touch only | |
-| M6 | Game feel: parallax, distinct box art per level, particles, streaks, results stars | Side-by-side play against the M1 build | |
+| M6 | Game feel: parallax, distinct box art per level, particles, streaks, results stars | Side-by-side play against the M1 build | done 2026-10-18 (DEC-003) |
 | M7 | Local profiles and personal bests | Scores persist across reloads per profile | |
 | M8 | Leaderboard API: Pages Functions + D1, rate limits, score plausibility, name word lists | API tests pass locally (wrangler) and on a preview deploy | |
 | M9 | Leaderboard client, Daily Challenge, privacy page | Two devices see each other's scores; offline play still works | |
