@@ -1,12 +1,18 @@
 import type { ImageSet } from '../engine/assets';
 import { WORLD_HEIGHT, WORLD_WIDTH } from './config';
+import type { RoundScore } from './scoring';
 import type { World } from './world';
 
 export type ImageKey = 'background' | 'crab' | 'rock' | 'seaweed' | 'box' | 'bubble';
 
 const HUD_FONT = 'bold 34px "Trebuchet MS", "Segoe UI", sans-serif';
 
-export function renderWorld(ctx: CanvasRenderingContext2D, world: World, images: ImageSet<ImageKey>): void {
+export function renderWorld(
+  ctx: CanvasRenderingContext2D,
+  world: World,
+  round: RoundScore,
+  images: ImageSet<ImageKey>,
+): void {
   ctx.drawImage(images.background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
   for (const ob of world.obstacles) {
@@ -35,22 +41,35 @@ export function renderWorld(ctx: CanvasRenderingContext2D, world: World, images:
     ctx.drawImage(images.bubble, b.x - b.radius, b.y - b.radius, b.radius * 2, b.radius * 2);
   }
 
-  drawHud(ctx, world);
+  drawHud(ctx, world, round);
 }
 
-function drawHud(ctx: CanvasRenderingContext2D, world: World): void {
-  pill(ctx, 12, 12, `Score: ${world.score}`, 'left');
+function drawHud(ctx: CanvasRenderingContext2D, world: World, round: RoundScore): void {
+  pill(ctx, 12, 12, `Score: ${round.score}`, 'left');
   pill(ctx, WORLD_WIDTH - 12, 12, `Time: ${Math.ceil(world.timeLeft)}`, 'right');
+  if (round.streak >= 2) {
+    const boost = round.nextMultiplier > 1 ? `  next ×${round.nextMultiplier}` : '';
+    pill(ctx, WORLD_WIDTH / 2, 12, `${round.streak} in a row!${boost}`, 'center', STREAK_FILL);
+  }
 }
 
-function pill(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, align: 'left' | 'right'): void {
+const STREAK_FILL = 'rgba(255,214,102,0.92)';
+
+function pill(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  text: string,
+  align: 'left' | 'right' | 'center',
+  fill = 'rgba(255,255,255,0.85)',
+): void {
   ctx.save();
   ctx.font = HUD_FONT;
   const padX = 14;
   const height = 50;
   const width = ctx.measureText(text).width + padX * 2;
-  const left = align === 'left' ? x : x - width;
-  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  const left = align === 'left' ? x : align === 'right' ? x - width : x - width / 2;
+  ctx.fillStyle = fill;
   ctx.beginPath();
   ctx.roundRect(left, y, width, height, 12);
   ctx.fill();

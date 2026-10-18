@@ -7,6 +7,7 @@ import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
 import { answerText, cardText, isCorrect, pickQuestion, type Question } from './game/questions';
 import { renderWorld, type ImageKey } from './game/render';
+import { RoundScore } from './game/scoring';
 import { World } from './game/world';
 
 import backgroundUrl from './assets/background.png';
@@ -58,6 +59,7 @@ async function main(): Promise<void> {
   let age: number | undefined;
   let rng = new Rng(randomSeed());
   let world = new World(rng);
+  let round = new RoundScore();
   let playing = false;
 
   // --- Setup screen -------------------------------------------------------
@@ -91,7 +93,8 @@ async function main(): Promise<void> {
     current = { question, level };
     playing = false;
     keys.clear();
-    levelText.textContent = `${'★'.repeat(level)}  ${level * POINTS_PER_LEVEL} points`;
+    const boost = round.nextMultiplier > 1 ? `  — streak ×${round.nextMultiplier}!` : '';
+    levelText.textContent = `${'★'.repeat(level)}  ${level * POINTS_PER_LEVEL} points${boost}`;
     questionText.textContent = cardText(question, rng);
     answerInput.value = '';
     answerInput.disabled = false;
@@ -106,10 +109,11 @@ async function main(): Promise<void> {
     if (!current || answerInput.disabled || answerInput.value.trim() === '') return;
     const { question, level } = current;
     answerInput.disabled = true;
-    if (isCorrect(question, answerInput.value)) {
-      const points = level * POINTS_PER_LEVEL;
-      world.score += points;
-      feedback.textContent = `Correct! +${points}`;
+    const right = isCorrect(question, answerInput.value);
+    const result = round.answer(level, right);
+    if (right) {
+      const inARow = result.streak >= 3 ? ` — ${result.streak} in a row!` : '';
+      feedback.textContent = `Correct! +${result.points}${inARow}`;
       feedback.dataset['result'] = 'good';
     } else {
       feedback.textContent = `The answer was: ${answerText(question)}. ${question.explain}`;
@@ -126,6 +130,7 @@ async function main(): Promise<void> {
   const startRound = (): void => {
     rng = new Rng(randomSeed());
     world = new World(rng);
+    round = new RoundScore();
     keys.clear();
     show();
     music.start();
@@ -135,7 +140,23 @@ async function main(): Promise<void> {
   const endRound = (): void => {
     playing = false;
     music.stop();
-    el('results-score').textContent = `You scored ${world.score} points`;
+    const stars = el('results-stars');
+    stars.textContent = '';
+    for (let i = 1; i <= 3; i++) {
+      const star = document.createElement('span');
+      star.className = 'results-star';
+      star.textContent = '★';
+      star.toggleAttribute('data-earned', i <= round.stars);
+      star.style.setProperty('--delay', `${i * 0.35}s`);
+      stars.append(star);
+    }
+    stars.setAttribute('aria-label', `${round.stars} out of 3 stars`);
+    el('results-score').textContent = `You scored ${round.score} points`;
+    el('results-tally').textContent =
+      round.answered === 0
+        ? 'Pop a box with a bubble to get a question!'
+        : `${round.correct} of ${round.answered} right` +
+          (round.bestStreak >= 3 ? ` · best streak ${round.bestStreak}` : '');
     show('results');
   };
 
@@ -164,7 +185,7 @@ async function main(): Promise<void> {
         else endRound();
       }
     },
-    () => renderWorld(ctx, world, images),
+    () => renderWorld(ctx, world, round, images),
   );
 
   show('splash');

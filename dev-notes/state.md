@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
-Milestone: M6 Game feel (not started)
-Next: Adam pushes `v2/m1-foundations` and opens one PR for M1+M2 → main; then, in a fresh session, plan M6 (parallax, distinct box art per level, particles, streaks, results stars)
+Milestone: M6 Game feel (in progress, 6a done)
+Next: 6b parallax. Push/PR of `v2/m1-foundations` is on hold (Adam, 2026-10-18).
 Milestones since review: 2
 
 Tier: 3 System
@@ -12,6 +12,20 @@ Updated: 2026-10-18
 M6 (from project.md): parallax, distinct box art per level, particles, streaks and
 results stars are in, and a side-by-side play against the M1 build shows the
 difference. Build order: M1 → M2 → M6 → M3 → M4 → …
+
+M6 plan (approved 2026-10-18). Work inline; every step touches `render.ts`.
+- [x] 6a `src/game/scoring.ts`: streak ×1.5 from 3, ×2 from 5; stars ★ any right,
+  ★★ ≥60% and ≥4 answered, ★★★ ≥85% and ≥6. HUD streak pill, results stars.
+- [ ] 6b Parallax: background split at the sand line and mirror-tiled (water 0.2×,
+  sand 1×), a code-drawn reef silhouette at 0.45×, light-ray shimmer. File untouched.
+- [ ] 6c Box per level: tinted copies of box1 made at load (wood / sea-green + shell /
+  gold + shimmer), and 1–3 star pips replace the number.
+- [ ] 6d `src/engine/particles.ts` with its own cosmetic RNG (never the round RNG;
+  Daily Challenge). Box splinters, bubble trail, landing puff, correct-answer
+  sparkle and "+N" pop, ambient plankton. Thinned under reduced motion.
+- [ ] 6e M1 build (`33e2441`, temp worktree) on a second port for side-by-side; tune.
+M6 out of scope: new image/audio files, screen shake, crab frames, question card
+(M4), menus (M5), deleting duplicate box2/box3.png.
 
 ## Last session
 
@@ -25,9 +39,8 @@ difference. Build order: M1 → M2 → M6 → M3 → M4 → …
 
 ## Open questions
 
-- M6 box art: box1/2/3.png are byte-identical. Distinct per-level art touches the
-  personal-art invariant, so ask Adam whether he or his son will draw the variants,
-  or whether a tint/overlay on the existing box is acceptable.
+- 6a play-check: a perfect 3 of 3 gets only ★ (the ★★ minimum is 4 answered).
+  Adam to judge whether that feels harsh at age 4.
 - Question review deferred by Adam: all 169 questions are still `draft`, so a
   production build ships none. Review before any preview deploy is played (M13 at
   the latest).

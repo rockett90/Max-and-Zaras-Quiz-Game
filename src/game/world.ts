@@ -44,7 +44,6 @@ export class World {
   timeLeft = ROUND_SECONDS;
   /** Total distance scrolled, for parallax backgrounds. */
   distance = 0;
-  score = 0;
   finished = false;
 
   constructor(private readonly rng: Rng) {}
