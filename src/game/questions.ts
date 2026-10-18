@@ -1,6 +1,7 @@
 /**
  * Picks and marks questions from the validated bank (`virtual:questions`, built from
- * content/questions/ by build/questionsPlugin.ts).
+ * content/questions/ by build/questionsPlugin.ts), mixed with generated arithmetic
+ * (./arithmetic.ts).
  *
  * The question card is a single text box until M4, so this module adapts the richer
  * question types to it: choice and true-false list their options in the prompt and
@@ -8,6 +9,7 @@
  */
 import bank from 'virtual:questions';
 import type { Rng } from '../engine/rng';
+import { generateQuestion } from './arithmetic';
 import type { Level } from './config';
 import type { Question } from './questionSchema';
 import { normaliseAnswer } from './text';
@@ -25,17 +27,28 @@ function distance(q: Question, age: number, level: Level): number {
   return ageGap * AGE_WEIGHT + Math.abs(q.level - level);
 }
 
+/** Share of numeracy picks that are a generated sum rather than from the bank. */
+export const GENERATED_SHARE = 0.5;
+
 /**
  * A question for this age and level. Picks a subject first so a large literacy bank
  * does not crowd out numeracy, then the closest match: exact when there is one,
  * otherwise the nearest level, then the nearest age. The fallback keeps every age
  * playable while content for ages 8–11 is thin (filled in M10).
+ *
+ * Numeracy is always on offer while `generatedShare` is above zero: a share of its
+ * picks are generated sums, and all of them are when the bank has no numeracy (a
+ * production build before review).
  */
-export function pickQuestion(age: number, level: Level, rng: Rng, questions: readonly Question[] = PLAYABLE): Question | undefined {
-  if (questions.length === 0) return undefined;
-  const subjects = [...new Set(questions.map((q) => q.subject))].sort();
-  const subject = rng.pick(subjects);
+export function pickQuestion(age: number, level: Level, rng: Rng, questions: readonly Question[] = PLAYABLE, generatedShare = GENERATED_SHARE): Question | undefined {
+  const subjects = new Set(questions.map((q) => q.subject));
+  if (generatedShare > 0) subjects.add('numeracy');
+  if (subjects.size === 0) return undefined;
+  const subject = rng.pick([...subjects].sort());
   const inSubject = questions.filter((q) => q.subject === subject);
+  if (subject === 'numeracy' && generatedShare > 0 && (inSubject.length === 0 || rng.chance(generatedShare))) {
+    return generateQuestion(age, level, rng);
+  }
   const best = Math.min(...inSubject.map((q) => distance(q, age, level)));
   return rng.pick(inSubject.filter((q) => distance(q, age, level) === best));
 }

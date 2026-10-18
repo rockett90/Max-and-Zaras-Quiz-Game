@@ -22,9 +22,9 @@ describe('pickQuestion', () => {
   it('prefers an exact match, then the nearest level, then the nearest age', () => {
     const bank = [q('exact', [5, 6], 2), q('level-off', [5, 6], 3), q('age-off', [7, 8], 2)];
     const rng = new Rng(1);
-    for (let i = 0; i < 20; i++) expect(pickQuestion(6, 2, rng, bank)?.id).toBe('exact');
-    expect(pickQuestion(6, 1, rng, [q('l3', [6, 6], 3), q('l2', [6, 6], 2)])?.id).toBe('l2');
-    expect(pickQuestion(10, 2, rng, [q('age-7', [4, 7], 2), q('age-9', [8, 9], 1)])?.id).toBe('age-9');
+    for (let i = 0; i < 20; i++) expect(pickQuestion(6, 2, rng, bank, 0)?.id).toBe('exact');
+    expect(pickQuestion(6, 1, rng, [q('l3', [6, 6], 3), q('l2', [6, 6], 2)], 0)?.id).toBe('l2');
+    expect(pickQuestion(10, 2, rng, [q('age-7', [4, 7], 2), q('age-9', [8, 9], 1)], 0)?.id).toBe('age-9');
   });
 
   it('gives each subject a fair share however big its bank', () => {
@@ -35,8 +35,20 @@ describe('pickQuestion', () => {
     expect(numeracy).toBeLessThan(250);
   });
 
-  it('returns nothing from an empty bank (a production build before review)', () => {
-    expect(pickQuestion(6, 1, new Rng(1), [])).toBeUndefined();
+  it('still offers generated sums from an empty bank (a production build before review)', () => {
+    const rng = new Rng(1);
+    for (let i = 0; i < 20; i++) expect(pickQuestion(6, 1, rng, [])?.id).toMatch(/^gen-/);
+    expect(pickQuestion(6, 1, rng, [], 0)).toBeUndefined();
+  });
+
+  it('mixes generated sums with bank numeracy at the set share', () => {
+    const bank = [q('num', [4, 11], 1, 'numeracy')];
+    const rng = new Rng(4);
+    const picks = Array.from({ length: 400 }, () => pickQuestion(6, 1, rng, bank, 0.5));
+    const generated = picks.filter((p) => p?.id.startsWith('gen-')).length;
+    expect(generated).toBeGreaterThan(150);
+    expect(generated).toBeLessThan(250);
+    expect(picks.every((p) => p?.subject === 'numeracy')).toBe(true);
   });
 });
 
