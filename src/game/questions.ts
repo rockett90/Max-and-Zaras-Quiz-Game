@@ -6,6 +6,9 @@ import type { Rng } from '../engine/rng';
 import literacy from '../../content/legacy/english_literacy.json';
 import maths from '../../content/legacy/english_maths.json';
 import type { Level } from './config';
+import { normaliseAnswer } from './text';
+
+export { normaliseAnswer };
 
 export interface Question {
   age: number;
@@ -24,16 +27,6 @@ export function pickQuestion(age: number, level: Level, rng: Rng): Question | un
   const bankAge = Math.min(age, LEGACY_MAX_AGE);
   const matches = bank.filter((q) => q.age === bankAge && q.level === level);
   return matches.length > 0 ? rng.pick(matches) : undefined;
-}
-
-/** Case- and accent-insensitive, whitespace-collapsed comparison. */
-export function normaliseAnswer(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim();
 }
 
 export function isCorrect(question: Question, given: string): boolean {

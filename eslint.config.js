@@ -14,6 +14,11 @@ export default tseslint.config(
     },
   },
   {
+    // Build-time code runs in Node, not the browser.
+    files: ['build/**/*.ts', 'vite.config.ts'],
+    languageOptions: { globals: { ...globals.node } },
+  },
+  {
     files: ['src/engine/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', { patterns: ['**/game/**'] }],

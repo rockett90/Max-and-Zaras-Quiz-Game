@@ -1,0 +1,23 @@
+# English numeracy: word problems and reasoning only. Plain arithmetic is generated
+# in code (M3), so it is not written here. Schema: src/game/questionSchema.ts.
+language: en
+subject: numeracy
+questions:
+  - id: en-num-triangle-sides
+    ages: 4-6
+    level: 1
+    type: choice
+    prompt: How many sides does a triangle have?
+    answer: "3"
+    choices: ["3", "4", "5"]
+    explain: Tri means three. A triangle has three straight sides.
+    status: draft
+
+  - id: en-num-even-ten
+    ages: 6-7
+    level: 2
+    type: true-false
+    prompt: 10 is an even number.
+    answer: true
+    explain: Even numbers can be shared into two equal groups. 10 makes two groups of 5.
+    status: draft

@@ -1,0 +1,42 @@
+# English literacy. Schema: src/game/questionSchema.ts.
+# Format examples only until the legacy bank is migrated; all drafts awaiting review.
+language: en
+subject: literacy
+questions:
+  - id: en-lit-first-letter-apple
+    ages: 4-5
+    level: 1
+    type: choice
+    prompt: What is the first letter of "apple"?
+    answer: a
+    choices: [a, p, e]
+    explain: Apple starts with the sound "a", written with the letter a.
+    status: draft
+
+  - id: en-lit-missing-letter-abcd
+    ages: 4-5
+    level: 1
+    type: choice
+    prompt: "Which letter is missing? A, B, __, D"
+    answer: C
+    choices: [C, E, F]
+    explain: The alphabet goes A, B, C, D.
+    status: draft
+
+  - id: en-lit-plural-cat
+    ages: 6-7
+    level: 2
+    type: typed
+    prompt: There is one cat. Now there are two. Write the word for more than one cat.
+    answer: cats
+    explain: For most words, add s to mean more than one, so cat becomes cats.
+    status: draft
+
+  - id: en-lit-alphabetical-order
+    ages: 6-8
+    level: 2
+    type: ordering
+    prompt: Put these words in alphabetical order.
+    answer: [ant, bee, cow, dog]
+    explain: Alphabetical order goes by the first letter, a b c d.
+    status: draft

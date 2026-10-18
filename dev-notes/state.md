@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
 Milestone: M2 Question schema + validator
-Next: Design the YAML question schema (project.md §4–5) and write the validator with tests before migrating any content
+Next: Adam reviews the schema (src/game/questionSchema.ts); then migrate and clean the 991 legacy questions into content/questions/en/ and switch src/game/questions.ts to `virtual:questions`
 Milestones since review: 1
 
 Tier: 3 System
@@ -16,6 +16,13 @@ bank and rejects seeded bad entries (duplicate, blank without choices, missing
 
 ## Last session
 
+- M2 in progress: schema + validator (`src/game/questionSchema.ts`), Vite plugin
+  `build/questionsPlugin.ts` (YAML → `virtual:questions`; validates at build start,
+  production drops `status: draft`, dev keeps them). Six draft example questions in
+  `content/questions/en/`. 53 tests, verify green. Not yet committed.
+- Decision to log at M2 close: REQ-CONT-001 is met by *excluding* drafts from
+  production builds, not failing the build on them, so in-progress content never
+  blocks a release. Invalid questions do fail the build.
 - M1 closed (DEC-001): Vite + TS rebuild with `src/engine/` + `src/game/`, gameplay
   bugs fixed, speeds raised ~45% and signed off by Adam, hosting decided (Cloudflare
   Pages + Functions + D1). Committed and pushed on branch `v2/m1-foundations`
