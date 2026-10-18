@@ -133,6 +133,16 @@ function hasDuplicates(items: readonly string[]): boolean {
   return new Set(items.map(normaliseAnswer)).size !== items.length;
 }
 
+/**
+ * Two questions are the same when their prompts match and, for choice and ordering,
+ * so do their options: "Which is the right spelling?" over different words is fine.
+ * Typed and true-false keep the prompt alone, as one prompt cannot have two answers.
+ */
+function sameQuestionKey(q: Question): string {
+  const options = q.type === 'choice' ? q.choices : q.type === 'ordering' ? q.answer : [];
+  return [q.prompt, ...[...options].sort()].map(normaliseAnswer).join('|');
+}
+
 function parseAges(value: unknown): { min: number; max: number } | undefined {
   let min: number;
   let max: number;
@@ -301,10 +311,10 @@ export function validateBank(files: readonly SourceFile[]): ValidationResult {
       }
       idSeen.set(q.id, source.file);
 
-      const promptKey = `${language}|${normaliseAnswer(q.prompt)}`;
+      const promptKey = `${language}|${sameQuestionKey(q)}`;
       const firstId = promptSeen.get(promptKey);
       if (firstId !== undefined) {
-        report(q.id, `duplicate prompt (same as ${firstId}); widen that question's ages instead`);
+        report(q.id, `duplicate question (same as ${firstId}); widen that question's ages instead`);
         return;
       }
       promptSeen.set(promptKey, q.id);

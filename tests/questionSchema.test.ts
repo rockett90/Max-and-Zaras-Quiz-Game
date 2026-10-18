@@ -58,7 +58,15 @@ describe('question validator', () => {
 
   it('rejects a duplicate id and a duplicate prompt', () => {
     const { issues } = validateBank(bank(good, { ...good, prompt: 'Something else?' }, { ...good, id: 'other-id', prompt: '  which word RHYMES with cat? ' }));
-    expect(issues.map((i) => i.message)).toEqual([expect.stringMatching(/duplicate id/), expect.stringMatching(/duplicate prompt/)]);
+    expect(issues.map((i) => i.message)).toEqual([expect.stringMatching(/duplicate id/), expect.stringMatching(/duplicate question/)]);
+  });
+
+  it('allows a repeated prompt over different choices, but not the same choices reordered', () => {
+    const spelling = { ...good, prompt: 'Which is the right spelling?', answer: 'tree', choices: ['tree', 'tre', 'trea'] };
+    const { issues } = validateBank(
+      bank(spelling, { ...spelling, id: 'other', answer: 'book', choices: ['book', 'buk', 'bouk'] }, { ...spelling, id: 'reordered', choices: ['trea', 'tree', 'tre'] }),
+    );
+    expect(issues.map((i) => i.where)).toEqual(['reordered']);
   });
 
   it('rejects a blank that is not multiple choice (REQ-CONT-002)', () => {

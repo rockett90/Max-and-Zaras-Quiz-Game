@@ -34,6 +34,15 @@ export class Rng {
     if (items.length === 0) throw new Error('Rng.pick on empty list');
     return items[Math.floor(this.next() * items.length)] as T;
   }
+
+  /** Shuffles `items` in place (Fisher–Yates) and returns it. */
+  shuffle<T>(items: T[]): T[] {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = this.int(0, i);
+      [items[i], items[j]] = [items[j] as T, items[i] as T];
+    }
+    return items;
+  }
 }
 
 export function randomSeed(): number {

@@ -1,16 +1,397 @@
-# English numeracy: word problems and reasoning only. Plain arithmetic is generated
-# in code (M3), so it is not written here. Schema: src/game/questionSchema.ts.
+# English numeracy. Schema: src/game/questionSchema.ts.
+#
+# Cleaned from content/legacy/english_maths.json (585 entries, 474 distinct).
+# Kept: counting, number order, comparing, shapes, patterns and a few word problems.
+# Dropped: every sum in disguise ("Solve: 3 + 4", "If you add 2 to 5", "Multiple
+# choice: What is 6 + 2?", ~400 entries), because arithmetic is generated in code
+# (M3) so it never repeats and scales with age. Legacy maths never passed 15 even at
+# age 10, so ages 8–11 are thin here on purpose — new content is M10. All drafts.
 language: en
 subject: numeracy
 questions:
+  # --- Counting and number order --------------------------------------------
+
+  - id: en-num-fingers-one-hand
+    ages: 4
+    level: 1
+    type: typed
+    prompt: How many fingers are on one hand, counting your thumb?
+    answer: "5"
+    accept: [five]
+    explain: Count them, 1, 2, 3, 4, 5. Thumb and four fingers make five.
+    status: draft
+
+  - id: en-num-count-to-3
+    ages: 4
+    level: 1
+    type: typed
+    prompt: 'Keep counting: 1, 2, ...'
+    answer: "3"
+    accept: [three]
+    explain: 1, 2, 3. Three comes after two.
+    status: draft
+
+  - id: en-num-count-to-5
+    ages: 4
+    level: 1
+    type: typed
+    prompt: 'Keep counting: 1, 2, 3, 4, ...'
+    answer: "5"
+    accept: [five]
+    explain: 1, 2, 3, 4, 5. Five comes after four.
+    status: draft
+
+  - id: en-num-after-1
+    ages: 4
+    level: 1
+    type: typed
+    prompt: What number comes after 1?
+    answer: "2"
+    accept: [two]
+    explain: 1, 2, 3. Two comes after one.
+    status: draft
+
+  - id: en-num-after-3
+    ages: 4
+    level: 1
+    type: typed
+    prompt: What number comes after 3?
+    answer: "4"
+    accept: [four]
+    explain: 2, 3, 4. Four comes after three.
+    status: draft
+
+  - id: en-num-before-5
+    ages: 4
+    level: 2
+    type: typed
+    prompt: What number comes just before 5?
+    answer: "4"
+    accept: [four]
+    explain: 3, 4, 5. Four comes just before five.
+    status: draft
+
+  - id: en-num-after-5
+    ages: 4
+    level: 2
+    type: typed
+    prompt: What number comes after 5?
+    answer: "6"
+    accept: [six]
+    explain: 4, 5, 6. Six comes after five.
+    status: draft
+
+  - id: en-num-before-8
+    ages: 4-5
+    level: 2
+    type: typed
+    prompt: What number comes just before 8?
+    answer: "7"
+    accept: [seven]
+    explain: 6, 7, 8. Seven comes just before eight.
+    status: draft
+
+  - id: en-num-before-10
+    ages: 4-5
+    level: 3
+    type: typed
+    prompt: What number comes just before 10?
+    answer: "9"
+    accept: [nine]
+    explain: 8, 9, 10. Nine comes just before ten.
+    status: draft
+
+  - id: en-num-after-7
+    ages: 5
+    level: 1
+    type: typed
+    prompt: What number comes after 7?
+    answer: "8"
+    accept: [eight]
+    explain: 6, 7, 8. Eight comes after seven.
+    status: draft
+
+  - id: en-num-after-10
+    ages: 5
+    level: 2
+    type: typed
+    prompt: What number comes after 10?
+    answer: "11"
+    accept: [eleven]
+    explain: 9, 10, 11. Eleven comes after ten.
+    status: draft
+
+  - id: en-num-before-12
+    ages: 5-6
+    level: 2
+    type: typed
+    prompt: What number comes just before 12?
+    answer: "11"
+    accept: [eleven]
+    explain: 10, 11, 12. Eleven comes just before twelve.
+    status: draft
+
+  - id: en-num-after-12
+    ages: 5-6
+    level: 2
+    type: typed
+    prompt: What number comes after 12?
+    answer: "13"
+    accept: [thirteen]
+    explain: 11, 12, 13. Thirteen comes after twelve.
+    status: draft
+
+  - id: en-num-before-15
+    ages: 5-6
+    level: 3
+    type: typed
+    prompt: What number comes just before 15?
+    answer: "14"
+    accept: [fourteen]
+    explain: 13, 14, 15. Fourteen comes just before fifteen.
+    status: draft
+
+  - id: en-num-after-15
+    ages: 5-6
+    level: 3
+    type: typed
+    prompt: What number comes after 15?
+    answer: "16"
+    accept: [sixteen]
+    explain: 14, 15, 16. Sixteen comes after fifteen.
+    status: draft
+
+  - id: en-num-missing-1-3
+    ages: 4
+    level: 1
+    type: choice
+    prompt: 'Which number is missing? 1, __, 3'
+    answer: "2"
+    choices: ["2", "4", "5"]
+    explain: 1, 2, 3. Two goes in the gap.
+    status: draft
+
+  - id: en-num-order-small-to-big
+    ages: 5-6
+    level: 2
+    type: ordering
+    prompt: Put these numbers in order, smallest first.
+    answer: ["2", "5", "8", "11"]
+    explain: Start with the smallest. 2, then 5, then 8, then 11.
+    status: draft
+
+  # --- Comparing ------------------------------------------------------------
+
+  - id: en-num-bigger-2-1
+    ages: 4
+    level: 1
+    type: choice
+    prompt: Which number is bigger?
+    answer: "2"
+    choices: ["2", "1"]
+    explain: Two is one more than one, so two is bigger.
+    status: draft
+
+  - id: en-num-smaller-1-3
+    ages: 4
+    level: 1
+    type: choice
+    prompt: Which number is smaller?
+    answer: "1"
+    choices: ["1", "3"]
+    explain: One comes before three when you count, so one is smaller.
+    status: draft
+
+  - id: en-num-greater-4-3
+    ages: 4
+    level: 2
+    type: choice
+    prompt: Which number is greater?
+    answer: "4"
+    choices: ["3", "4"]
+    explain: Greater means bigger. Four is one more than three.
+    status: draft
+
+  - id: en-num-smaller-3-5
+    ages: 5
+    level: 1
+    type: choice
+    prompt: Which number is smaller?
+    answer: "3"
+    choices: ["5", "3"]
+    explain: Three comes before five when you count, so three is smaller.
+    status: draft
+
+  - id: en-num-greater-than-true-false
+    ages: 5-6
+    level: 2
+    type: true-false
+    prompt: 9 is greater than 6.
+    answer: true
+    explain: Count up from 6, 7, 8, 9. Nine comes later, so it is greater.
+    status: draft
+
+  # --- Shapes and everyday counting ------------------------------------------
+
   - id: en-num-triangle-sides
-    ages: 4-6
+    ages: 4-5
     level: 1
     type: choice
     prompt: How many sides does a triangle have?
     answer: "3"
     choices: ["3", "4", "5"]
     explain: Tri means three. A triangle has three straight sides.
+    status: draft
+
+  - id: en-num-triangle-corners
+    ages: 5
+    level: 1
+    type: choice
+    prompt: How many corners does a triangle have?
+    answer: "3"
+    choices: ["2", "3", "4"]
+    explain: A triangle has three sides and three corners.
+    status: draft
+
+  - id: en-num-square-sides
+    ages: 4-5
+    level: 1
+    type: choice
+    prompt: How many sides does a square have?
+    answer: "4"
+    choices: ["3", "4", "5"]
+    explain: A square has four straight sides, all the same length.
+    status: draft
+
+  - id: en-num-square-corners
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: How many corners does a square have?
+    answer: "4"
+    choices: ["4", "3", "6"]
+    explain: A square has four corners, one where each pair of sides meet.
+    status: draft
+
+  - id: en-num-rectangle-sides
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: How many sides does a rectangle have?
+    answer: "4"
+    choices: ["4", "3", "5"]
+    explain: A rectangle has four sides, two long and two short.
+    status: draft
+
+  - id: en-num-rectangle-corners
+    ages: 5-6
+    level: 1
+    type: choice
+    prompt: How many corners does a rectangle have?
+    answer: "4"
+    choices: ["2", "4", "6"]
+    explain: A rectangle has four corners, like a door or a book.
+    status: draft
+
+  - id: en-num-pentagon-sides
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: How many sides does a pentagon have?
+    answer: "5"
+    choices: ["4", "5", "6"]
+    explain: Penta means five. A pentagon has five sides.
+    status: draft
+
+  - id: en-num-circle-corners-true-false
+    ages: 4-5
+    level: 2
+    type: true-false
+    prompt: A circle has corners.
+    answer: false
+    explain: A circle is perfectly round. It has one curved side and no corners.
+    status: draft
+
+  - id: en-num-tricycle-wheels
+    ages: 4
+    level: 1
+    type: choice
+    prompt: How many wheels does a tricycle have?
+    answer: "3"
+    choices: ["2", "3", "4"]
+    explain: Tri means three, like in triangle. A tricycle has three wheels.
+    status: draft
+
+  - id: en-num-cat-legs
+    ages: 4
+    level: 1
+    type: choice
+    prompt: How many legs does a cat have?
+    answer: "4"
+    choices: ["2", "4", "6"]
+    explain: Cats walk on four legs, like dogs.
+    status: draft
+
+  - id: en-num-dog-legs
+    ages: 4
+    level: 1
+    type: typed
+    prompt: How many legs does a dog have?
+    answer: "4"
+    accept: [four]
+    explain: Dogs walk on four legs.
+    status: draft
+
+  # --- Patterns -------------------------------------------------------------
+
+  - id: en-num-pattern-2-4-6
+    ages: 5
+    level: 3
+    type: choice
+    prompt: 'Which number is missing? 2, __, 6'
+    answer: "4"
+    choices: ["3", "4", "5"]
+    explain: The numbers go up in twos. 2, 4, 6.
+    status: draft
+
+  - id: en-num-pattern-3-5-7
+    ages: 6
+    level: 2
+    type: choice
+    prompt: 'Which number is missing? 3, __, 7'
+    answer: "5"
+    choices: ["4", "5", "6"]
+    explain: The numbers go up in twos. 3, 5, 7.
+    status: draft
+
+  - id: en-num-pattern-4-6-8
+    ages: 6
+    level: 2
+    type: choice
+    prompt: 'Which number is missing? 4, __, 8'
+    answer: "6"
+    choices: ["5", "6", "7"]
+    explain: The numbers go up in twos. 4, 6, 8.
+    status: draft
+
+  - id: en-num-pattern-5-7-9
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which number is missing? 5, __, 9'
+    answer: "7"
+    choices: ["6", "7", "8"]
+    explain: The numbers go up in twos. 5, 7, 9.
+    status: draft
+
+  - id: en-num-pattern-6-8-10
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which number is missing? 6, __, 10'
+    answer: "8"
+    choices: ["7", "8", "9"]
+    explain: The numbers go up in twos. 6, 8, 10.
     status: draft
 
   - id: en-num-even-ten
@@ -20,4 +401,56 @@ questions:
     prompt: 10 is an even number.
     answer: true
     explain: Even numbers can be shared into two equal groups. 10 makes two groups of 5.
+    status: draft
+
+  # --- Word problems (one of each kind; more come from the M3 generators) ----
+
+  - id: en-num-word-apples-get-more
+    ages: 4
+    level: 2
+    type: typed
+    prompt: You have 2 apples and get 1 more. How many apples do you have now?
+    answer: "3"
+    accept: [three]
+    explain: 2 and 1 more makes 3. Count on from 2, then 3.
+    status: draft
+
+  - id: en-num-word-apples-eat-one
+    ages: 4
+    level: 3
+    type: typed
+    prompt: You have 3 apples and eat 1. How many are left?
+    answer: "2"
+    accept: [two]
+    explain: Take 1 away from 3 and you have 2 left.
+    status: draft
+
+  - id: en-num-word-give-friend
+    ages: 5
+    level: 3
+    type: typed
+    prompt: You have 4 apples and give 1 to a friend. How many do you have left?
+    answer: "3"
+    accept: [three]
+    explain: Giving one away means taking 1 from 4, which leaves 3.
+    status: draft
+
+  - id: en-num-word-fruit-total
+    ages: 5-6
+    level: 3
+    type: typed
+    prompt: You have 2 apples and 2 oranges. How many pieces of fruit is that?
+    answer: "4"
+    accept: [four]
+    explain: Apples and oranges are both fruit, so add them. 2 and 2 make 4.
+    status: draft
+
+  - id: en-num-word-blocks-lose
+    ages: 5-6
+    level: 2
+    type: typed
+    prompt: You build a tower of 5 blocks and 2 fall off. How many blocks are still in the tower?
+    answer: "3"
+    accept: [three]
+    explain: 5 take away 2 leaves 3.
     status: draft

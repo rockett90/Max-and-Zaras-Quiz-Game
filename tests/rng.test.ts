@@ -29,4 +29,11 @@ describe('Rng', () => {
   it('refuses to pick from an empty list', () => {
     expect(() => new Rng(1).pick([])).toThrow();
   });
+
+  it('shuffles reproducibly without losing items', () => {
+    const a = new Rng(9).shuffle([1, 2, 3, 4, 5, 6]);
+    expect(new Rng(9).shuffle([1, 2, 3, 4, 5, 6])).toEqual(a);
+    expect([...a].sort()).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(a).not.toEqual([1, 2, 3, 4, 5, 6]);
+  });
 });

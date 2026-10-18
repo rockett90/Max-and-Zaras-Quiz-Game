@@ -5,7 +5,7 @@ import { startLoop } from './engine/loop';
 import { randomSeed, Rng } from './engine/rng';
 import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
-import { isCorrect, pickQuestion, type Question } from './game/questions';
+import { answerText, cardText, isCorrect, pickQuestion, type Question } from './game/questions';
 import { renderWorld, type ImageKey } from './game/render';
 import { World } from './game/world';
 
@@ -92,7 +92,7 @@ async function main(): Promise<void> {
     playing = false;
     keys.clear();
     levelText.textContent = `${'★'.repeat(level)}  ${level * POINTS_PER_LEVEL} points`;
-    questionText.textContent = question.question;
+    questionText.textContent = cardText(question, rng);
     answerInput.value = '';
     answerInput.disabled = false;
     feedback.textContent = '';
@@ -112,7 +112,7 @@ async function main(): Promise<void> {
       feedback.textContent = `Correct! +${points}`;
       feedback.dataset['result'] = 'good';
     } else {
-      feedback.textContent = `The answer was: ${question.answer}`;
+      feedback.textContent = `The answer was: ${answerText(question)}. ${question.explain}`;
       feedback.dataset['result'] = 'bad';
     }
     current = undefined;

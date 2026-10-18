@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
 Milestone: M2 Question schema + validator
-Next: Adam reviews the schema (src/game/questionSchema.ts); then migrate and clean the 991 legacy questions into content/questions/en/ and switch src/game/questions.ts to `virtual:questions`
+Next: Adam reviews the 169 draft questions in content/questions/en/ and flips reviewed ones to `status: reviewed` (production builds ship none until then); then delete content/legacy/, log DEC-002 and close M2 with one PR
 Milestones since review: 1
 
 Tier: 3 System
@@ -16,10 +16,18 @@ bank and rejects seeded bad entries (duplicate, blank without choices, missing
 
 ## Last session
 
-- M2 in progress: schema + validator (`src/game/questionSchema.ts`), Vite plugin
-  `build/questionsPlugin.ts` (YAML → `virtual:questions`; validates at build start,
-  production drops `status: draft`, dev keeps them). Six draft example questions in
-  `content/questions/en/`. 53 tests, verify green. Not yet committed.
+- M2 schema + validator + plugin committed (680ea1d). `build/questionsPlugin.ts`
+  serves YAML as `virtual:questions`; production drops drafts, dev keeps them.
+- Legacy bank cleaned into `content/questions/en/`: 125 literacy + 44 numeracy, all
+  `draft`. ~400 disguised sums dropped (M3 generates); "Spell x" rewritten as
+  pick-the-spelling; ambiguous `c_t` gaps made choice with a clue; letter sounds
+  dropped until read-aloud. Coverage stops around age 9 (legacy never went higher);
+  `pickQuestion` falls back to nearest level then nearest age until M10.
+- `src/game/questions.ts` now reads `virtual:questions` through an interim adapter
+  for the one-text-box card: choices shown in the prompt (shuffled, new
+  `Rng.shuffle`), true/false typed, ordering held back until M4; a miss shows
+  `explain`. Duplicate check now keys on prompt + options. 61 tests, verify green,
+  play-checked in the dev server. Not yet committed.
 - Decision to log at M2 close: REQ-CONT-001 is met by *excluding* drafts from
   production builds, not failing the build on them, so in-progress content never
   blocks a release. Invalid questions do fail the build.

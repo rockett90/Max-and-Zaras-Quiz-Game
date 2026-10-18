@@ -1,30 +1,895 @@
 # English literacy. Schema: src/game/questionSchema.ts.
-# Format examples only until the legacy bank is migrated; all drafts awaiting review.
+#
+# Cleaned from content/legacy/english_literacy.json (406 entries, 239 distinct):
+# repeats merged into age ranges; "Spell the word 'x'" (answer shown in the prompt)
+# rewritten as pick-the-spelling; "c_t" gaps (several words fit) made multiple
+# choice with a clue; letter-sound questions dropped until read-aloud (M4).
+# The legacy bank barely rose above Reception level, so ages 9–11 are thin here
+# on purpose — new content for them is M10. All drafts until Adam reviews.
 language: en
 subject: literacy
 questions:
+  # --- Letters and the alphabet --------------------------------------------
+
+  - id: en-lit-round-letter
+    ages: 4
+    level: 1
+    type: choice
+    prompt: Which letter is round?
+    answer: O
+    choices: [O, X, T]
+    explain: O is a circle shape. X and T are made of straight lines.
+    status: draft
+
   - id: en-lit-first-letter-apple
+    ages: 4
+    level: 1
+    type: choice
+    prompt: 'What is the first letter of "apple"?'
+    answer: a
+    choices: [a, p, e]
+    explain: Apple starts with a. Say it slowly, a-pple.
+    status: draft
+
+  - id: en-lit-first-letter-dog
+    ages: 4
+    level: 1
+    type: choice
+    prompt: 'What letter does "dog" start with?'
+    answer: d
+    choices: [d, g, b]
+    explain: Dog starts with the d sound, d-o-g.
+    status: draft
+
+  - id: en-lit-first-letter-ball
+    ages: 4
+    level: 1
+    type: choice
+    prompt: 'What letter does "ball" start with?'
+    answer: b
+    choices: [b, d, l]
+    explain: Ball starts with b. Be careful, b and d look alike!
+    status: draft
+
+  - id: en-lit-first-letter-egg
+    ages: 4
+    level: 1
+    type: choice
+    prompt: 'What is the first letter of "egg"?'
+    answer: e
+    choices: [e, a, g]
+    explain: Egg starts with e, e-gg.
+    status: draft
+
+  - id: en-lit-first-letter-sun
     ages: 4-5
     level: 1
     type: choice
-    prompt: What is the first letter of "apple"?
+    prompt: 'What is the first letter of "sun"?'
+    answer: s
+    choices: [s, n, c]
+    explain: Sun starts with the hissing sound s, s-u-n.
+    status: draft
+
+  - id: en-lit-first-letter-red
+    ages: 5
+    level: 1
+    type: choice
+    prompt: 'What is the first letter of "red"?'
+    answer: r
+    choices: [r, d, w]
+    explain: Red starts with r, r-e-d.
+    status: draft
+
+  - id: en-lit-first-letter-cup
+    ages: 5
+    level: 1
+    type: choice
+    prompt: 'What is the first letter of "cup"?'
+    answer: c
+    choices: [c, k, p]
+    explain: Cup starts with c. K makes the same sound, but cup is spelt with c.
+    status: draft
+
+  - id: en-lit-first-letter-orange
+    ages: 5
+    level: 1
+    type: choice
+    prompt: 'What is the first letter of "orange"?'
+    answer: o
+    choices: [o, a, r]
+    explain: Orange starts with o, o-range.
+    status: draft
+
+  - id: en-lit-first-letter-elephant
+    ages: 5
+    level: 1
+    type: choice
+    prompt: 'What is the first letter of "elephant"?'
+    answer: e
+    choices: [e, l, a]
+    explain: Elephant starts with e, e-le-phant.
+    status: draft
+
+  - id: en-lit-last-letter-pig
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'What is the last letter of "pig"?'
+    answer: g
+    choices: [g, p, i]
+    explain: P-i-g. The last sound is g.
+    status: draft
+
+  - id: en-lit-last-letter-hat
+    ages: 5
+    level: 1
+    type: choice
+    prompt: 'What is the last letter of "hat"?'
+    answer: t
+    choices: [t, h, a]
+    explain: H-a-t. The last sound is t.
+    status: draft
+
+  - id: en-lit-last-letter-frog
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'What is the last letter of "frog"?'
+    answer: g
+    choices: [g, f, o]
+    explain: F-r-o-g. The last sound is g.
+    status: draft
+
+  - id: en-lit-last-letter-zebra
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'What is the last letter of "zebra"?'
     answer: a
-    choices: [a, p, e]
-    explain: Apple starts with the sound "a", written with the letter a.
+    choices: [a, z, r]
+    explain: Z-e-b-r-a. Zebra ends with a.
+    status: draft
+
+  - id: en-lit-middle-letter-sun
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'What is the middle letter of "sun"?'
+    answer: u
+    choices: [u, s, n]
+    explain: S-u-n. The sound in the middle is u.
+    status: draft
+
+  - id: en-lit-after-a
+    ages: 4
+    level: 1
+    type: choice
+    prompt: Which letter comes after A?
+    answer: B
+    choices: [B, C, Z]
+    explain: The alphabet starts A, B, C.
+    status: draft
+
+  - id: en-lit-after-c
+    ages: 4
+    level: 2
+    type: choice
+    prompt: Which letter comes after C?
+    answer: D
+    choices: [D, B, E]
+    explain: A, B, C, D. D comes after C.
+    status: draft
+
+  - id: en-lit-before-d
+    ages: 4
+    level: 2
+    type: choice
+    prompt: Which letter comes before D?
+    answer: C
+    choices: [C, E, B]
+    explain: A, B, C, D. C comes just before D.
+    status: draft
+
+  - id: en-lit-after-e
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: Which letter comes after E?
+    answer: F
+    choices: [F, D, G]
+    explain: D, E, F, G. F comes after E.
+    status: draft
+
+  - id: en-lit-after-g
+    ages: 5
+    level: 1
+    type: choice
+    prompt: Which letter comes after G?
+    answer: H
+    choices: [H, F, I]
+    explain: E, F, G, H. H comes after G.
+    status: draft
+
+  - id: en-lit-after-k
+    ages: 5
+    level: 2
+    type: choice
+    prompt: Which letter comes after K?
+    answer: L
+    choices: [L, J, M]
+    explain: J, K, L, M. L comes after K.
+    status: draft
+
+  - id: en-lit-before-m
+    ages: 5
+    level: 2
+    type: choice
+    prompt: Which letter comes before M?
+    answer: L
+    choices: [L, N, K]
+    explain: K, L, M, N. L comes just before M.
+    status: draft
+
+  - id: en-lit-before-q
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: Which letter comes before Q?
+    answer: P
+    choices: [P, R, O]
+    explain: O, P, Q, R. P comes just before Q.
+    status: draft
+
+  - id: en-lit-after-r
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: Which letter comes after R?
+    answer: S
+    choices: [S, Q, T]
+    explain: Q, R, S, T. S comes after R.
+    status: draft
+
+  - id: en-lit-before-z
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: Which letter comes before Z?
+    answer: Y
+    choices: [Y, X, W]
+    explain: The alphabet ends W, X, Y, Z.
     status: draft
 
   - id: en-lit-missing-letter-abcd
-    ages: 4-5
+    ages: 4
     level: 1
     type: choice
-    prompt: "Which letter is missing? A, B, __, D"
+    prompt: 'Which letter is missing? A, B, __, D'
     answer: C
     choices: [C, E, F]
     explain: The alphabet goes A, B, C, D.
     status: draft
 
-  - id: en-lit-plural-cat
+  - id: en-lit-missing-letter-defg
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'Which letter is missing? D, E, __, G'
+    answer: F
+    choices: [F, H, C]
+    explain: D, E, F, G. F goes in the gap.
+    status: draft
+
+  - id: en-lit-missing-letter-efgh
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'Which letter is missing? E, F, __, H'
+    answer: G
+    choices: [G, I, D]
+    explain: E, F, G, H. G goes in the gap.
+    status: draft
+
+  - id: en-lit-missing-letter-jklm
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'Which letter is missing? J, K, __, M'
+    answer: L
+    choices: [L, N, I]
+    explain: J, K, L, M. L goes in the gap.
+    status: draft
+
+  - id: en-lit-alphabet-first-word
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: Which word comes first in the alphabet?
+    answer: apple
+    choices: [apple, ball, cat]
+    explain: Apple starts with a, which comes before b and c.
+    status: draft
+
+  - id: en-lit-alphabetical-order-animals
     ages: 6-7
+    level: 2
+    type: ordering
+    prompt: Put these words in alphabetical order.
+    answer: [ant, bee, cow, dog]
+    explain: Look at the first letters. A, b, c, d.
+    status: draft
+
+  - id: en-lit-alphabetical-order-fruit
+    ages: 7-8
+    level: 2
+    type: ordering
+    prompt: Put these fruits in alphabetical order.
+    answer: [apple, banana, grape, orange, pear]
+    explain: Look at the first letters. A, b, g, o, p.
+    status: draft
+
+  # --- Vowels ---------------------------------------------------------------
+
+  - id: en-lit-vowel-abc
+    ages: 4
+    level: 3
+    type: choice
+    prompt: Which letter is a vowel?
+    answer: A
+    choices: [A, B, C]
+    explain: The vowels are a, e, i, o and u. A is a vowel.
+    status: draft
+
+  - id: en-lit-vowel-bet
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: Which of these is a vowel?
+    answer: E
+    choices: [B, E, T]
+    explain: The vowels are a, e, i, o and u. E is a vowel.
+    status: draft
+
+  - id: en-lit-vowel-ij
+    ages: 5
+    level: 2
+    type: choice
+    prompt: Which letter is a vowel, I or J?
+    answer: I
+    choices: [I, J]
+    explain: The vowels are a, e, i, o and u. I is a vowel.
+    status: draft
+
+  - id: en-lit-vowel-otr
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: Pick the vowel.
+    answer: O
+    choices: [T, O, R]
+    explain: The vowels are a, e, i, o and u. O is a vowel.
+    status: draft
+
+  - id: en-lit-vowel-uv
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: Which letter is a vowel, U or V?
+    answer: U
+    choices: [U, V]
+    explain: The vowels are a, e, i, o and u. U is a vowel.
+    status: draft
+
+  - id: en-lit-vowel-count
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: How many vowels are there in the alphabet?
+    answer: "5"
+    choices: ["3", "5", "7"]
+    explain: There are five vowels, a, e, i, o and u. Sometimes y acts like one too.
+    status: draft
+
+  - id: en-lit-vowel-k-true-false
+    ages: 5-6
+    level: 2
+    type: true-false
+    prompt: K is a vowel.
+    answer: false
+    explain: The vowels are a, e, i, o and u. K is a consonant.
+    status: draft
+
+  # --- Missing letters (several words can fit a gap, so always with a clue) --
+
+  - id: en-lit-gap-cat
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'A pet that says miaow is a c_t. Which letter is missing?'
+    answer: a
+    choices: [a, o, u]
+    explain: C-a-t spells cat. Cot is a baby bed and cut is what scissors do.
+    status: draft
+
+  - id: en-lit-gap-dog
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'A pet that says woof is a d_g. Which letter is missing?'
+    answer: o
+    choices: [o, i, u]
+    explain: D-o-g spells dog. Dig is what you do with a spade.
+    status: draft
+
+  - id: en-lit-gap-sun
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'The s_n is bright and hot. Which letter is missing?'
+    answer: u
+    choices: [u, a, i]
+    explain: S-u-n spells sun.
+    status: draft
+
+  - id: en-lit-gap-bat
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'You hit a ball with a b_t. Which letter is missing?'
+    answer: a
+    choices: [a, e, i]
+    explain: B-a-t spells bat. Bet and bit are different words.
+    status: draft
+
+  - id: en-lit-gap-hat
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'You wear a h_t on your head. Which letter is missing?'
+    answer: a
+    choices: [a, o, i]
+    explain: H-a-t spells hat. Hot and hit are different words.
+    status: draft
+
+  - id: en-lit-gap-pig
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'A pink farm animal that says oink is a p_g. Which letter is missing?'
+    answer: i
+    choices: [i, e, a]
+    explain: P-i-g spells pig.
+    status: draft
+
+  - id: en-lit-gap-bug
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'A tiny creepy-crawly is a b_g. Which letter is missing?'
+    answer: u
+    choices: [u, a, i]
+    explain: B-u-g spells bug. Bag and big are different words.
+    status: draft
+
+  - id: en-lit-gap-bag
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'You carry your things in a b_g. Which letter is missing?'
+    answer: a
+    choices: [a, u, i]
+    explain: B-a-g spells bag.
+    status: draft
+
+  - id: en-lit-gap-cup
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'You drink from a c_p. Which letter is missing?'
+    answer: u
+    choices: [u, a, o]
+    explain: C-u-p spells cup. Cap is a hat.
+    status: draft
+
+  - id: en-lit-gap-mat
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'The cat sat on the m_t. Which letter is missing?'
+    answer: a
+    choices: [a, e, o]
+    explain: M-a-t spells mat. Met and mot are different words.
+    status: draft
+
+  - id: en-lit-gap-fan
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'A f_n keeps you cool on a hot day. Which letter is missing?'
+    answer: a
+    choices: [a, u, i]
+    explain: F-a-n spells fan. Fun and fin are different words.
+    status: draft
+
+  - id: en-lit-gap-pen
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'You write with a p_n. Which letter is missing?'
+    answer: e
+    choices: [e, i, a]
+    explain: P-e-n spells pen. Pin and pan are different words.
+    status: draft
+
+  - id: en-lit-gap-dad
+    ages: 4
+    level: 2
+    type: choice
+    prompt: 'Mum and d_d. Which letter is missing?'
+    answer: a
+    choices: [a, i, u]
+    explain: D-a-d spells dad.
+    status: draft
+
+  - id: en-lit-gap-run
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'Faster than walking is to r_n. Which letter is missing?'
+    answer: u
+    choices: [u, a, i]
+    explain: R-u-n spells run. Ran is what you did yesterday.
+    status: draft
+
+  - id: en-lit-gap-top
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'The highest part of a hill is the t_p. Which letter is missing?'
+    answer: o
+    choices: [o, i, a]
+    explain: T-o-p spells top. Tip and tap are different words.
+    status: draft
+
+  - id: en-lit-gap-jump
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'Frogs j_mp high. Which letter is missing?'
+    answer: u
+    choices: [u, a, i]
+    explain: J-u-m-p spells jump.
+    status: draft
+
+  - id: en-lit-gap-can
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'Beans come in a metal c_n. Which letter is missing?'
+    answer: a
+    choices: [a, o, u]
+    explain: C-a-n spells can.
+    status: draft
+
+  - id: en-lit-gap-ball
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'You kick a round b_ll. Which letter is missing?'
+    answer: a
+    choices: [a, e, i]
+    explain: B-a-l-l spells ball. Bell rings and bill is a bird's beak.
+    status: draft
+
+  - id: en-lit-gap-tree
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'A tall plant with leaves and branches is a t_ee. Which letter is missing?'
+    answer: r
+    choices: [r, h, w]
+    explain: T-r-e-e spells tree.
+    status: draft
+
+  - id: en-lit-gap-book
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'You read a b_ok. Which letter is missing?'
+    answer: o
+    choices: [o, a, u]
+    explain: B-o-o-k spells book. It has a double o.
+    status: draft
+
+  - id: en-lit-gap-foot
+    ages: 5-6
+    level: 3
+    type: choice
+    prompt: 'You wear a sock on your f__t. Which letters are missing?'
+    answer: oo
+    choices: [oo, ee, ea]
+    explain: F-o-o-t spells foot. Feet is more than one foot.
+    status: draft
+
+  - id: en-lit-gap-frog
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'A green animal that hops and croaks is a f_og. Which letter is missing?'
+    answer: r
+    choices: [r, l, o]
+    explain: F-r-o-g spells frog.
+    status: draft
+
+  - id: en-lit-gap-orange
+    ages: 6
+    level: 2
+    type: choice
+    prompt: 'A round fruit with the same name as its colour is an o_ange. Which letter is missing?'
+    answer: r
+    choices: [r, l, w]
+    explain: O-r-a-n-g-e spells orange.
+    status: draft
+
+  - id: en-lit-gap-purple
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Red and blue mixed make p_rple. Which letter is missing?'
+    answer: u
+    choices: [u, e, i]
+    explain: P-u-r-p-l-e spells purple.
+    status: draft
+
+  - id: en-lit-gap-banana
+    ages: 6
+    level: 2
+    type: choice
+    prompt: 'A long yellow fruit is a b_nana. Which letter is missing?'
+    answer: a
+    choices: [a, e, o]
+    explain: B-a-n-a-n-a. Banana has three a's.
+    status: draft
+
+  - id: en-lit-gap-giraffe
+    ages: 6-7
+    level: 3
+    type: choice
+    prompt: 'An animal with a very long neck is a g_raffe. Which letter is missing?'
+    answer: i
+    choices: [i, e, a]
+    explain: G-i-r-a-f-f-e spells giraffe.
+    status: draft
+
+  - id: en-lit-gap-school
+    ages: 6-7
+    level: 3
+    type: choice
+    prompt: 'You go to sc_ool to learn. Which letter is missing?'
+    answer: h
+    choices: [h, k, o]
+    explain: School has a silent h. S-c-h-o-o-l.
+    status: draft
+
+  - id: en-lit-gap-monkey
+    ages: 6
+    level: 2
+    type: choice
+    prompt: 'A cheeky animal that swings in the trees is a m_nkey. Which letter is missing?'
+    answer: o
+    choices: [o, a, u]
+    explain: M-o-n-k-e-y spells monkey.
+    status: draft
+
+  # --- Spelling (pick the right one; the old "Spell the word" showed its answer) --
+
+  - id: en-lit-spell-cat
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: Which is the right spelling of the pet that says miaow?
+    answer: cat
+    choices: [cat, kat, catt]
+    explain: Cat is spelt c-a-t.
+    status: draft
+
+  - id: en-lit-spell-dog
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: Which is the right spelling of the pet that says woof?
+    answer: dog
+    choices: [dog, dogg, dgo]
+    explain: Dog is spelt d-o-g.
+    status: draft
+
+  - id: en-lit-spell-sun
+    ages: 5
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the thing that shines in the sky in the day?
+    answer: sun
+    choices: [sun, son, sunn]
+    explain: The sun in the sky is spelt s-u-n. Son means a boy in a family.
+    status: draft
+
+  - id: en-lit-spell-red
+    ages: 5
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the colour of a fire engine?
+    answer: red
+    choices: [red, redd, rad]
+    explain: Red is spelt r-e-d.
+    status: draft
+
+  - id: en-lit-spell-tree
+    ages: 5-6
+    level: 3
+    type: choice
+    prompt: Which is the right spelling?
+    answer: tree
+    choices: [tree, tre, trea]
+    explain: Tree has a double e, t-r-e-e.
+    status: draft
+
+  - id: en-lit-spell-book
+    ages: 6
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the thing you read?
+    answer: book
+    choices: [book, buk, bouk]
+    explain: Book has a double o, b-o-o-k.
+    status: draft
+
+  - id: en-lit-spell-green
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the colour of grass?
+    answer: green
+    choices: [green, grean, grene]
+    explain: Green has a double e, g-r-e-e-n.
+    status: draft
+
+  - id: en-lit-spell-apple
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the crunchy fruit?
+    answer: apple
+    choices: [apple, aple, appel]
+    explain: Apple has a double p and ends in le, a-p-p-l-e.
+    status: draft
+
+  - id: en-lit-spell-lion
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the big cat that roars?
+    answer: lion
+    choices: [lion, lyon, lien]
+    explain: Lion is spelt l-i-o-n.
+    status: draft
+
+  - id: en-lit-spell-purple
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: Which is the right spelling?
+    answer: purple
+    choices: [purple, perple, purpel]
+    explain: Purple is spelt p-u-r-p-l-e. Many words end in le, like apple and table.
+    status: draft
+
+  - id: en-lit-spell-monkey
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: Which is the right spelling?
+    answer: monkey
+    choices: [monkey, munkey, monky]
+    explain: Monkey is spelt m-o-n-k-e-y, ending in ey.
+    status: draft
+
+  - id: en-lit-spell-school
+    ages: 7-8
+    level: 3
+    type: choice
+    prompt: Which is the right spelling of the place where you learn?
+    answer: school
+    choices: [school, skool, scool]
+    explain: School has a silent h, s-c-h-o-o-l.
+    status: draft
+
+  - id: en-lit-spell-giraffe
+    ages: 8-9
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the animal with the longest neck?
+    answer: giraffe
+    choices: [giraffe, jiraffe, girafe]
+    explain: Giraffe starts with a soft g and has a double f, g-i-r-a-f-f-e.
+    status: draft
+
+  - id: en-lit-spell-elephant
+    ages: 8-9
+    level: 2
+    type: choice
+    prompt: Which is the right spelling of the animal with a trunk?
+    answer: elephant
+    choices: [elephant, elefant, elephent]
+    explain: Elephant uses ph for the f sound, e-l-e-p-h-a-n-t.
+    status: draft
+
+  # --- Rhymes ---------------------------------------------------------------
+
+  - id: en-lit-rhyme-cat
+    ages: 4
+    level: 3
+    type: choice
+    prompt: 'Which word rhymes with "cat"?'
+    answer: bat
+    choices: [bat, car, cup]
+    explain: Cat and bat both end with "at".
+    status: draft
+
+  - id: en-lit-rhyme-hat
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: 'Which word rhymes with "hat"?'
+    answer: mat
+    choices: [mat, cup, sun]
+    explain: Hat and mat both end with "at".
+    status: draft
+
+  - id: en-lit-rhyme-dog
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'Which word rhymes with "dog"?'
+    answer: log
+    choices: [log, cat, pen]
+    explain: Dog and log both end with "og".
+    status: draft
+
+  - id: en-lit-rhyme-bag
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'Which word rhymes with "bag"?'
+    answer: rag
+    choices: [rag, pen, cup]
+    explain: Bag and rag both end with "ag".
+    status: draft
+
+  - id: en-lit-rhyme-tree
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'Which word rhymes with "tree"?'
+    answer: free
+    choices: [free, car, book]
+    explain: Tree and free both end with the "ee" sound.
+    status: draft
+
+  - id: en-lit-rhyme-school
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which word rhymes with "school"?'
+    answer: pool
+    choices: [pool, tree, cat]
+    explain: School and pool both end with "ool".
+    status: draft
+
+  # --- Plurals and verb tenses ---------------------------------------------
+
+  - id: en-lit-plural-cat
+    ages: 5
     level: 2
     type: typed
     prompt: There is one cat. Now there are two. Write the word for more than one cat.
@@ -32,11 +897,375 @@ questions:
     explain: For most words, add s to mean more than one, so cat becomes cats.
     status: draft
 
-  - id: en-lit-alphabetical-order
+  - id: en-lit-plural-dog
+    ages: 5-6
+    level: 2
+    type: typed
+    prompt: 'One dog, two ...? Write the missing word.'
+    answer: dogs
+    explain: Add s to mean more than one, so dog becomes dogs.
+    status: draft
+
+  - id: en-lit-plural-apple
+    ages: 6
+    level: 2
+    type: typed
+    prompt: 'One apple, three ...? Write the missing word.'
+    answer: apples
+    explain: Add s to mean more than one, so apple becomes apples.
+    status: draft
+
+  - id: en-lit-plural-monkey
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: Which is the right word for more than one monkey?
+    answer: monkeys
+    choices: [monkeys, monkies, monkeyes]
+    explain: When a word ends in a vowel and y, just add s. Monkey becomes monkeys.
+    status: draft
+
+  - id: en-lit-past-jump
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Today I jump. Yesterday I ...'
+    answer: jumped
+    choices: [jumped, jumpt, jump]
+    explain: For many verbs we add ed to say it already happened, so jump becomes jumped.
+    status: draft
+
+  - id: en-lit-past-run
+    ages: 6-7
+    level: 3
+    type: choice
+    prompt: 'Today I run. Yesterday I ...'
+    answer: ran
+    choices: [ran, runned, run]
+    explain: Run is a tricky verb. We don't say runned, we say ran.
+    status: draft
+
+  - id: en-lit-past-write
+    ages: 7-9
+    level: 2
+    type: choice
+    prompt: 'Choose the right word: Yesterday I __ a story.'
+    answer: wrote
+    choices: [wrote, writ, written]
+    explain: Write becomes wrote. Written needs a helper word, like "I have written".
+    status: draft
+
+  - id: en-lit-ending-sleeping
+    ages: 5-6
+    level: 3
+    type: choice
+    prompt: 'Choose the right word: The cat is __.'
+    answer: sleeping
+    choices: [sleeping, sleeped, sleep]
+    explain: After "is" we add ing, so the cat is sleeping.
+    status: draft
+
+  - id: en-lit-homophone-read
     ages: 6-8
     level: 2
-    type: ordering
-    prompt: Put these words in alphabetical order.
-    answer: [ant, bee, cow, dog]
-    explain: Alphabetical order goes by the first letter, a b c d.
+    type: choice
+    prompt: 'Choose the right word: I like to __ a book.'
+    answer: read
+    choices: [read, red, reed]
+    explain: Read is what you do with a book. Red is a colour and a reed is a plant.
+    status: draft
+
+  # --- Missing words --------------------------------------------------------
+
+  - id: en-lit-word-cat-sat
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: 'The cat __ on the mat.'
+    answer: sat
+    choices: [sat, sit, sad]
+    explain: The cat sat on the mat. Sat tells us it already happened.
+    status: draft
+
+  - id: en-lit-word-sun-hot
+    ages: 4-5
+    level: 2
+    type: choice
+    prompt: 'The sun is __.'
+    answer: hot
+    choices: [hot, wet, cold]
+    explain: The sun is very hot. That is why we feel warm in sunshine.
+    status: draft
+
+  - id: en-lit-word-bird-flies
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'The bird __ in the sky.'
+    answer: flies
+    choices: [flies, swims, digs]
+    explain: Birds fly using their wings.
+    status: draft
+
+  - id: en-lit-word-fish-swims
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: 'The fish __ in the water.'
+    answer: swims
+    choices: [swims, flies, walks]
+    explain: Fish swim using their fins and tails.
+    status: draft
+
+  - id: en-lit-word-sky-blue
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'On a sunny day the sky is __ and clear.'
+    answer: blue
+    choices: [blue, green, wet]
+    explain: A clear sky on a sunny day looks blue.
+    status: draft
+
+  # --- Opposites and same meanings ------------------------------------------
+
+  - id: en-lit-opposite-big
+    ages: 4-5
+    level: 3
+    type: choice
+    prompt: 'What is the opposite of "big"?'
+    answer: small
+    choices: [small, huge, tall]
+    explain: Big and small are opposites. Huge means very big.
+    status: draft
+
+  - id: en-lit-opposite-hot
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'What is the opposite of "hot"?'
+    answer: cold
+    choices: [cold, warm, wet]
+    explain: Hot and cold are opposites.
+    status: draft
+
+  - id: en-lit-opposite-up
+    ages: 5
+    level: 2
+    type: choice
+    prompt: 'What is the opposite of "up"?'
+    answer: down
+    choices: [down, top, over]
+    explain: Up and down are opposites.
+    status: draft
+
+  - id: en-lit-opposite-day
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'What is the opposite of "day"?'
+    answer: night
+    choices: [night, sun, morning]
+    explain: Day and night are opposites. Night is when it is dark.
+    status: draft
+
+  - id: en-lit-opposite-fast
+    ages: 5-6
+    level: 2
+    type: choice
+    prompt: 'What is the opposite of "fast"?'
+    answer: slow
+    choices: [slow, quick, run]
+    explain: Fast and slow are opposites. Quick means the same as fast.
+    status: draft
+
+  - id: en-lit-same-happy-glad
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which word means the same as "happy"?'
+    answer: glad
+    choices: [glad, sad, mad]
+    explain: Glad means happy. Words that mean the same are called synonyms.
+    status: draft
+
+  - id: en-lit-same-big-large
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which word means the same as "big"?'
+    answer: large
+    choices: [large, small, short]
+    explain: Large means big.
+    status: draft
+
+  - id: en-lit-same-small-tiny
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which word means "very small"?'
+    answer: tiny
+    choices: [tiny, huge, large]
+    explain: Tiny means very small. Huge means very big.
+    status: draft
+
+  - id: en-lit-same-angry-cross
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: 'Which word means the same as "angry"?'
+    answer: cross
+    choices: [cross, glad, calm]
+    explain: Cross means angry. Calm is the opposite.
+    status: draft
+
+  - id: en-lit-synonym-happy-joyful
+    ages: 8-9
+    level: 2
+    type: choice
+    prompt: 'Which word is a synonym for "happy"?'
+    answer: joyful
+    choices: [joyful, gloomy, furious]
+    explain: A synonym means the same. Joyful means full of joy, so happy.
+    status: draft
+
+  - id: en-lit-synonym-tiny-wee
+    ages: 8-9
+    level: 3
+    type: choice
+    prompt: 'Which word means the same as "tiny"?'
+    answer: wee
+    choices: [wee, vast, enormous]
+    explain: Wee is an old word for tiny, still used in Scotland. Vast and enormous mean very big.
+    status: draft
+
+  # --- Word classes and punctuation -----------------------------------------
+
+  - id: en-lit-noun-dog-runs
+    ages: 5-6
+    level: 3
+    type: choice
+    prompt: 'Which word is a noun? "The dog runs."'
+    answer: dog
+    choices: [dog, the, runs]
+    explain: A noun is a person, place or thing. A dog is a thing, so dog is the noun.
+    status: draft
+
+  - id: en-lit-noun-car-fast
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which word is a noun? "The car is fast."'
+    answer: car
+    choices: [car, is, fast]
+    explain: A noun is a person, place or thing. Car is a thing.
+    status: draft
+
+  - id: en-lit-noun-list-dog
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: Which word is a noun?
+    answer: dog
+    choices: [run, happy, dog]
+    explain: A noun is a person, place or thing. Run is a doing word and happy is a describing word.
+    status: draft
+
+  - id: en-lit-noun-list-computer
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: Which word is a noun?
+    answer: computer
+    choices: [computer, run, quickly]
+    explain: A computer is a thing, so it is a noun. Quickly describes how something is done.
+    status: draft
+
+  - id: en-lit-noun-frog-jumps
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: 'Which word is the noun? "The frog jumps quickly."'
+    answer: frog
+    choices: [frog, jumps, quickly]
+    explain: The frog is the thing doing the jumping, so frog is the noun.
+    status: draft
+
+  - id: en-lit-adjective-red-ball
+    ages: 6-7
+    level: 3
+    type: choice
+    prompt: 'Which word describes the ball? "The red ball bounces."'
+    answer: red
+    choices: [red, ball, bounces]
+    explain: Red tells us what the ball looks like. Describing words are called adjectives.
+    status: draft
+
+  - id: en-lit-adjective-blue-car
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: 'Which word is the adjective? "The blue car is fast."'
+    answer: blue
+    choices: [blue, car, is]
+    explain: An adjective describes a noun. Blue describes the car. (Fast is an adjective too, but it is not a choice here.)
+    status: draft
+
+  - id: en-lit-adjective-small-dog
+    ages: 8-9
+    level: 2
+    type: choice
+    prompt: 'Which word is the adjective? "The small dog barked loudly."'
+    answer: small
+    choices: [small, barked, loudly]
+    explain: Small describes the dog, so it is an adjective. Loudly describes how it barked, so it is an adverb.
+    status: draft
+
+  - id: en-lit-verb-cat-sleeps
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'Which word is the doing word? "The cat sleeps."'
+    answer: sleeps
+    choices: [sleeps, cat, the]
+    explain: Sleeps is what the cat does. Doing words are called verbs.
+    status: draft
+
+  - id: en-lit-verb-dog-barks
+    ages: 7-8
+    level: 2
+    type: choice
+    prompt: 'Which word is the verb? "The dog barks at the postman."'
+    answer: barks
+    choices: [barks, dog, postman]
+    explain: A verb is a doing word. Barks is what the dog does.
+    status: draft
+
+  - id: en-lit-punctuation-question
+    ages: 5-6
+    level: 3
+    type: choice
+    prompt: 'What goes at the end? "How are you"'
+    answer: '?'
+    choices: ['?', '.', ',']
+    explain: How are you is a question, so it ends with a question mark.
+    status: draft
+
+  - id: en-lit-punctuation-question-where
+    ages: 6-7
+    level: 2
+    type: choice
+    prompt: 'What goes at the end? "Where are we going"'
+    answer: '?'
+    choices: ['?', '.', '!']
+    explain: Where are we going asks something, so it ends with a question mark.
+    status: draft
+
+  - id: en-lit-punctuation-question-true-false
+    ages: 6-7
+    level: 2
+    type: true-false
+    prompt: A question ends with a question mark.
+    answer: true
+    explain: Questions end with ?, like "What is your name?"
     status: draft
