@@ -3,9 +3,8 @@
  * content/questions/ by build/questionsPlugin.ts), mixed with generated arithmetic
  * (./arithmetic.ts).
  *
- * Marking takes an `Answer` shaped by the card that collected it. Until M4 4b's card
- * exists the card is a single text box, so `cardText` lists choice options in the
- * prompt and `textAnswer` reads the box back as an Answer; ordering waits for 4c.
+ * Marking takes an `Answer` shaped by the card that collected it (src/ui/card.ts).
+ * Ordering questions stay out of play until their card arrives in M4 4c.
  */
 import bank from 'virtual:questions';
 import type { Rng } from '../engine/rng';
@@ -17,7 +16,8 @@ import { normaliseAnswer } from './text';
 export { normaliseAnswer };
 export type { Question };
 
-const PLAYABLE: readonly Question[] = bank.filter((q) => q.type !== 'ordering');
+/** Bank questions with a card to show them on. */
+export const PLAYABLE: readonly Question[] = bank.filter((q) => q.type !== 'ordering');
 
 /** Age gaps outweigh level gaps when the bank has nothing exact. */
 const AGE_WEIGHT = 10;
@@ -53,25 +53,11 @@ export function pickQuestion(age: number, level: Level, rng: Rng, questions: rea
   return rng.pick(inSubject.filter((q) => distance(q, age, level) === best));
 }
 
-/** The prompt as shown on the interim text-box card, with the options shuffled in. */
-export function cardText(question: Question, rng: Rng): string {
-  switch (question.type) {
-    case 'choice':
-      return `${question.prompt}  (${rng.shuffle([...question.choices]).join(' / ')})`;
-    case 'true-false':
-      return `${question.prompt}  (true or false?)`;
-    case 'typed':
-      return question.prompt;
-    case 'ordering':
-      return `${question.prompt}  (${rng.shuffle([...question.answer]).join(', ')})`;
-  }
-}
-
 /** The correct answer as written, for feedback after a miss. */
 export function answerText(question: Question): string {
   switch (question.type) {
     case 'true-false':
-      return question.answer ? 'true' : 'false';
+      return question.answer ? 'True' : 'False';
     case 'ordering':
       return question.answer.join(', ');
     default:
@@ -122,26 +108,5 @@ export function mark(question: Question, answer: Answer): Mark {
       const spelling = accepted.find((a) => normaliseAnswer(a) === loose);
       return spelling === undefined ? { right: false } : { right: true, spelling };
     }
-  }
-}
-
-const TRUE_WORDS = new Set(['true', 't', 'yes', 'y']);
-const FALSE_WORDS = new Set(['false', 'f', 'no', 'n']);
-
-/**
- * Reads the interim text-box card's input as an Answer. Goes with cardText when
- * M4 4b's card arrives. Unrecognised true/false words stay typed, so they mark wrong.
- */
-export function textAnswer(question: Question, text: string): Answer {
-  const g = normaliseAnswer(text);
-  switch (question.type) {
-    case 'choice':
-      return { type: 'choice', choice: text };
-    case 'true-false':
-      return TRUE_WORDS.has(g) ? { type: 'true-false', value: true } : FALSE_WORDS.has(g) ? { type: 'true-false', value: false } : { type: 'typed', text };
-    case 'typed':
-      return { type: 'typed', text };
-    case 'ordering':
-      return { type: 'ordering', order: text.split(',') };
   }
 }

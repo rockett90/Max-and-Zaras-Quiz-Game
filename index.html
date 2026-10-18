@@ -38,11 +38,13 @@
 
         <section id="screen-question" class="screen screen--dim" aria-live="polite">
           <form id="question-form" class="card" autocomplete="off">
-            <p id="question-level" class="card__level"></p>
-            <p id="question-text" class="card__text"></p>
-            <input id="question-answer" class="card__input" type="text" inputmode="text" aria-label="Your answer" />
-            <button class="btn" type="submit">Check</button>
-            <p id="question-feedback" class="card__feedback"></p>
+            <p class="card__level"></p>
+            <div class="card__timer" role="meter" aria-label="Seconds left" aria-valuemin="0">
+              <div class="card__timer-fill"></div>
+            </div>
+            <p class="card__text"></p>
+            <div class="card__answers"></div>
+            <p class="card__feedback"></p>
           </form>
         </section>
 

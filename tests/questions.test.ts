@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../src/engine/rng';
 import type { Question, TypedQuestion } from '../src/game/questionSchema';
-import { answerText, cardText, mark, normaliseAnswer, pickQuestion, textAnswer } from '../src/game/questions';
+import { answerText, mark, normaliseAnswer, pickQuestion } from '../src/game/questions';
 
 const base = { language: 'en', subject: 'literacy', explain: 'Because.', status: 'reviewed' } as const;
 
@@ -82,7 +82,7 @@ describe('marking', () => {
     const tf: Question = { ...base, id: 'tf', ages: { min: 4, max: 4 }, level: 1, type: 'true-false', prompt: 'K is a vowel.', answer: false };
     expect(mark(tf, { type: 'true-false', value: false }).right).toBe(true);
     expect(mark(tf, { type: 'true-false', value: true }).right).toBe(false);
-    expect(answerText(tf)).toBe('false');
+    expect(answerText(tf)).toBe('False');
 
     const order: Question = { ...base, id: 'o', ages: { min: 4, max: 4 }, level: 1, type: 'ordering', prompt: 'Order.', answer: ['ant', 'bee', 'cow'] };
     expect(mark(order, { type: 'ordering', order: ['ant', 'bee', 'cow'] }).right).toBe(true);
@@ -94,20 +94,5 @@ describe('marking', () => {
     const tf: Question = { ...base, id: 'tf', ages: { min: 4, max: 4 }, level: 1, type: 'true-false', prompt: 'K is a vowel.', answer: false };
     expect(mark(tf, { type: 'typed', text: 'false' }).right).toBe(false);
     expect(mark(q('t', [4, 4], 1), { type: 'choice', choice: 'x' }).right).toBe(false);
-  });
-
-  it('reads the interim text box back as an answer', () => {
-    const tf: Question = { ...base, id: 'tf', ages: { min: 4, max: 4 }, level: 1, type: 'true-false', prompt: 'K is a vowel.', answer: false };
-    expect(mark(tf, textAnswer(tf, 'No')).right).toBe(true);
-    expect(mark(tf, textAnswer(tf, 'maybe')).right).toBe(false);
-    const choice: Question = { ...base, id: 'c', ages: { min: 4, max: 4 }, level: 1, type: 'choice', prompt: 'Rhymes with cat?', answer: 'hat', choices: ['hat', 'dog'] };
-    expect(mark(choice, textAnswer(choice, ' Hat ')).right).toBe(true);
-  });
-
-  it('shows every choice on the card, shuffled', () => {
-    const choice: Question = { ...base, id: 'c', ages: { min: 4, max: 4 }, level: 1, type: 'choice', prompt: 'Pick.', answer: 'a', choices: ['a', 'b', 'c', 'd'] };
-    const texts = new Set(Array.from({ length: 20 }, (_, i) => cardText(choice, new Rng(i))));
-    expect(texts.size).toBeGreaterThan(1);
-    for (const t of texts) expect([...t.matchAll(/[abcd]\b/g)]).toHaveLength(4);
   });
 });
