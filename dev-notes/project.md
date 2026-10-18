@@ -43,7 +43,7 @@ translation questions between a child's languages.
 
 | # | Milestone | Done when | Status |
 |---|-----------|-----------|--------|
-| M1 | Foundations: Vite + TS, fixed-timestep loop, asset preloader, scaling canvas, `pnpm verify` | Current gameplay runs with flicker, frame-rate speed and list-splice bugs fixed; verify green | done 2026-10-18, pending play-test |
+| M1 | Foundations: Vite + TS, fixed-timestep loop, asset preloader, scaling canvas, `pnpm verify` | Current gameplay runs with flicker, frame-rate speed and list-splice bugs fixed; verify green | done 2026-10-18 (DEC-001) |
 | M2 | Question schema + validator; YAML→JSON build; cleaned English banks migrated | Validator passes the cleaned bank and rejects seeded bad entries | |
 | M3 | Procedural maths generators per age/level | Tests prove every generator's output range by age and level | |
 | M4 | Question card: choice, true/false, typed, ordering; per-question timer with speed bonus; explanations, second chance, end-of-round review; read-aloud | Playable round exercising every answer type | |
