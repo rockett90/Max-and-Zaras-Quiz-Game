@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../src/engine/rng';
 import { CHOICE_MAX_AGE, generateQuestion, generateSum, type Op } from '../src/game/arithmetic';
-import { isCorrect } from '../src/game/questions';
+import { mark } from '../src/game/questions';
 
 const SEEDS = 500;
 
@@ -170,8 +170,9 @@ describe('generateQuestion', () => {
     let q = generateQuestion(11, 2, rng);
     while (!q.answer.toString().startsWith('-')) q = generateQuestion(11, 2, rng);
     const n = q.answer.toString().slice(1);
-    expect(isCorrect(q, `-${n}`)).toBe(true);
-    expect(isCorrect(q, `−${n}`)).toBe(true);
-    expect(isCorrect(q, n)).toBe(false);
+    const typed = (text: string): boolean => mark(q, { type: 'typed', text }).right;
+    expect(typed(`-${n}`)).toBe(true);
+    expect(typed(`−${n}`)).toBe(true);
+    expect(typed(n)).toBe(false);
   });
 });

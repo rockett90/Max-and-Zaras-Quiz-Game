@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Rng } from '../src/engine/rng';
 import type { Question, TypedQuestion } from '../src/game/questionSchema';
-import { answerText, cardText, isCorrect, normaliseAnswer, pickQuestion } from '../src/game/questions';
+import { answerText, cardText, mark, normaliseAnswer, pickQuestion, textAnswer } from '../src/game/questions';
 
 const base = { language: 'en', subject: 'literacy', explain: 'Because.', status: 'reviewed' } as const;
 
@@ -59,28 +59,49 @@ describe('marking', () => {
 
   it('marks typed answers with alternatives, and strict accents when flagged', () => {
     const typed: TypedQuestion = { ...q('t', [4, 4], 1), answer: 'año', accept: ['year'] };
-    expect(isCorrect(typed, ' ANO ')).toBe(true);
-    expect(isCorrect(typed, 'Year')).toBe(true);
-    expect(isCorrect(typed, 'ana')).toBe(false);
+    const type = (text: string) => ({ type: 'typed', text }) as const;
+    expect(mark(typed, type(' AÑO '))).toEqual({ right: true });
+    expect(mark(typed, type('Year'))).toEqual({ right: true });
+    expect(mark(typed, type('ana'))).toEqual({ right: false });
     const strict: TypedQuestion = { ...typed, strictAccents: true };
-    expect(isCorrect(strict, 'Año')).toBe(true);
-    expect(isCorrect(strict, 'ano')).toBe(false);
+    expect(mark(strict, type('Año'))).toEqual({ right: true });
+    expect(mark(strict, type('ano'))).toEqual({ right: false });
   });
 
-  it('marks choice, true-false and ordering answers typed into the card', () => {
+  it('scores a typed answer with missing accents but shows the accented spelling', () => {
+    const typed: TypedQuestion = { ...q('t', [4, 4], 1), answer: 'año', accept: [] };
+    expect(mark(typed, { type: 'typed', text: 'ano' })).toEqual({ right: true, spelling: 'año' });
+    expect(mark(typed, { type: 'typed', text: 'äño' })).toEqual({ right: true, spelling: 'año' });
+  });
+
+  it('marks choice, true-false and ordering answers from their own cards', () => {
     const choice: Question = { ...base, id: 'c', ages: { min: 4, max: 4 }, level: 1, type: 'choice', prompt: 'Rhymes with cat?', answer: 'hat', choices: ['hat', 'dog'] };
-    expect(isCorrect(choice, 'Hat')).toBe(true);
-    expect(isCorrect(choice, 'dog')).toBe(false);
+    expect(mark(choice, { type: 'choice', choice: 'hat' }).right).toBe(true);
+    expect(mark(choice, { type: 'choice', choice: 'dog' }).right).toBe(false);
 
     const tf: Question = { ...base, id: 'tf', ages: { min: 4, max: 4 }, level: 1, type: 'true-false', prompt: 'K is a vowel.', answer: false };
-    expect(isCorrect(tf, 'false')).toBe(true);
-    expect(isCorrect(tf, 'No')).toBe(true);
-    expect(isCorrect(tf, 'true')).toBe(false);
+    expect(mark(tf, { type: 'true-false', value: false }).right).toBe(true);
+    expect(mark(tf, { type: 'true-false', value: true }).right).toBe(false);
     expect(answerText(tf)).toBe('false');
 
     const order: Question = { ...base, id: 'o', ages: { min: 4, max: 4 }, level: 1, type: 'ordering', prompt: 'Order.', answer: ['ant', 'bee', 'cow'] };
-    expect(isCorrect(order, 'Ant, bee ,cow')).toBe(true);
-    expect(isCorrect(order, 'bee, ant, cow')).toBe(false);
+    expect(mark(order, { type: 'ordering', order: ['ant', 'bee', 'cow'] }).right).toBe(true);
+    expect(mark(order, { type: 'ordering', order: ['bee', 'ant', 'cow'] }).right).toBe(false);
+    expect(mark(order, { type: 'ordering', order: ['ant', 'bee'] }).right).toBe(false);
+  });
+
+  it('marks an answer from the wrong kind of card as wrong', () => {
+    const tf: Question = { ...base, id: 'tf', ages: { min: 4, max: 4 }, level: 1, type: 'true-false', prompt: 'K is a vowel.', answer: false };
+    expect(mark(tf, { type: 'typed', text: 'false' }).right).toBe(false);
+    expect(mark(q('t', [4, 4], 1), { type: 'choice', choice: 'x' }).right).toBe(false);
+  });
+
+  it('reads the interim text box back as an answer', () => {
+    const tf: Question = { ...base, id: 'tf', ages: { min: 4, max: 4 }, level: 1, type: 'true-false', prompt: 'K is a vowel.', answer: false };
+    expect(mark(tf, textAnswer(tf, 'No')).right).toBe(true);
+    expect(mark(tf, textAnswer(tf, 'maybe')).right).toBe(false);
+    const choice: Question = { ...base, id: 'c', ages: { min: 4, max: 4 }, level: 1, type: 'choice', prompt: 'Rhymes with cat?', answer: 'hat', choices: ['hat', 'dog'] };
+    expect(mark(choice, textAnswer(choice, ' Hat ')).right).toBe(true);
   });
 
   it('shows every choice on the card, shuffled', () => {

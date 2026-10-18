@@ -3,9 +3,9 @@
  * content/questions/ by build/questionsPlugin.ts), mixed with generated arithmetic
  * (./arithmetic.ts).
  *
- * The question card is a single text box until M4, so this module adapts the richer
- * question types to it: choice and true-false list their options in the prompt and
- * are marked as typed answers; ordering waits for M4's drag-and-drop card.
+ * Marking takes an `Answer` shaped by the card that collected it. Until M4 4b's card
+ * exists the card is a single text box, so `cardText` lists choice options in the
+ * prompt and `textAnswer` reads the box back as an Answer; ordering waits for 4c.
  */
 import bank from 'virtual:questions';
 import type { Rng } from '../engine/rng';
@@ -79,27 +79,69 @@ export function answerText(question: Question): string {
   }
 }
 
-const TRUE_WORDS = new Set(['true', 't', 'yes', 'y']);
-const FALSE_WORDS = new Set(['false', 'f', 'no', 'n']);
+/** What the child gave, in the shape of the card that collected it. */
+export type Answer =
+  | { type: 'choice'; choice: string }
+  | { type: 'true-false'; value: boolean }
+  | { type: 'typed'; text: string }
+  | { type: 'ordering'; order: readonly string[] };
 
-/** Like normaliseAnswer but keeps accents, for `strictAccents` questions. */
+export interface Mark {
+  right: boolean;
+  /**
+   * The accented spelling, when a right typed answer differed from it only by
+   * accents (REQ-ANS-001): it scores, and the feedback shows how it is written.
+   */
+  spelling?: string;
+}
+
+/** Like normaliseAnswer but keeps accents. */
 function normaliseStrict(text: string): string {
   return text.normalize('NFC').toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
-export function isCorrect(question: Question, given: string): boolean {
-  const g = normaliseAnswer(given);
+/** Marks an answer. One from a different kind of card is simply wrong. */
+export function mark(question: Question, answer: Answer): Mark {
   switch (question.type) {
     case 'choice':
-      return g === normaliseAnswer(question.answer);
+      return { right: answer.type === 'choice' && normaliseAnswer(answer.choice) === normaliseAnswer(question.answer) };
     case 'true-false':
-      return (question.answer ? TRUE_WORDS : FALSE_WORDS).has(g);
-    case 'typed': {
-      const norm = question.strictAccents ? normaliseStrict : normaliseAnswer;
-      const typed = norm(given);
-      return [question.answer, ...question.accept].some((a) => norm(a) === typed);
+      return { right: answer.type === 'true-false' && answer.value === question.answer };
+    case 'ordering': {
+      const order = answer.type === 'ordering' ? answer.order.map(normaliseAnswer) : [];
+      const expected = question.answer.map(normaliseAnswer);
+      return { right: order.length === expected.length && order.every((item, i) => item === expected[i]) };
     }
+    case 'typed': {
+      if (answer.type !== 'typed') return { right: false };
+      const accepted = [question.answer, ...question.accept];
+      const exact = normaliseStrict(answer.text);
+      if (accepted.some((a) => normaliseStrict(a) === exact)) return { right: true };
+      if (question.strictAccents) return { right: false };
+      const loose = normaliseAnswer(answer.text);
+      const spelling = accepted.find((a) => normaliseAnswer(a) === loose);
+      return spelling === undefined ? { right: false } : { right: true, spelling };
+    }
+  }
+}
+
+const TRUE_WORDS = new Set(['true', 't', 'yes', 'y']);
+const FALSE_WORDS = new Set(['false', 'f', 'no', 'n']);
+
+/**
+ * Reads the interim text-box card's input as an Answer. Goes with cardText when
+ * M4 4b's card arrives. Unrecognised true/false words stay typed, so they mark wrong.
+ */
+export function textAnswer(question: Question, text: string): Answer {
+  const g = normaliseAnswer(text);
+  switch (question.type) {
+    case 'choice':
+      return { type: 'choice', choice: text };
+    case 'true-false':
+      return TRUE_WORDS.has(g) ? { type: 'true-false', value: true } : FALSE_WORDS.has(g) ? { type: 'true-false', value: false } : { type: 'typed', text };
+    case 'typed':
+      return { type: 'typed', text };
     case 'ordering':
-      return g.split(/\s*,\s*/).join(',') === question.answer.map(normaliseAnswer).join(',');
+      return { type: 'ordering', order: text.split(',') };
   }
 }

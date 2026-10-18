@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RoundScore, starsFor, streakMultiplier } from '../src/game/scoring';
+import { RoundScore, speedBonus, starsFor, streakMultiplier, timeLimitFor } from '../src/game/scoring';
 
 describe('streakMultiplier', () => {
   it('is 1 below three in a row, 1.5 at three and four, 2 from five', () => {
@@ -40,7 +40,7 @@ describe('RoundScore', () => {
   it('resets the streak on a wrong answer but keeps the best', () => {
     const round = new RoundScore();
     for (let i = 0; i < 4; i++) round.answer(2, true);
-    expect(round.answer(2, false)).toEqual({ points: 0, multiplier: 1, streak: 0 });
+    expect(round.answer(2, false)).toEqual({ points: 0, multiplier: 1, speedBonus: 0, streak: 0 });
     expect(round.answer(2, true).points).toBe(20);
     expect(round.bestStreak).toBe(4);
     expect([round.correct, round.answered]).toEqual([5, 6]);
@@ -52,5 +52,42 @@ describe('RoundScore', () => {
     expect(round.nextMultiplier).toBe(1);
     round.answer(1, true);
     expect(round.nextMultiplier).toBe(1.5);
+  });
+
+  it('adds the speed bonus after the streak multiplier', () => {
+    const round = new RoundScore();
+    round.answer(2, true);
+    round.answer(2, true);
+    // Third in a row: 20 × 1.5 = 30, plus the full bonus of 10.
+    expect(round.answer(2, true, { timing: { seconds: 1, limit: 10 } })).toEqual({ points: 40, multiplier: 1.5, speedBonus: 10, streak: 3 });
+  });
+
+  it('gives a second chance half points, no speed bonus, and leaves the stars alone', () => {
+    const round = new RoundScore();
+    round.answer(2, false);
+    const retry = round.answer(2, true, { retry: true, timing: { seconds: 0, limit: 10 } });
+    expect(retry).toEqual({ points: 10, multiplier: 1, speedBonus: 0, streak: 1 });
+    expect([round.correct, round.answered]).toEqual([0, 1]);
+    round.answer(2, false, { retry: true });
+    expect(round.answered).toBe(1);
+  });
+});
+
+describe('timeLimitFor', () => {
+  it('gives 20 s at 4–5, 15 s at 6–7 and 10 s at 8–11', () => {
+    expect([4, 5, 6, 7, 8, 11].map(timeLimitFor)).toEqual([20, 20, 15, 15, 10, 10]);
+  });
+});
+
+describe('speedBonus', () => {
+  it('is half the level points in the first quarter of the limit', () => {
+    expect(speedBonus(1, 0, 20)).toBe(5);
+    expect(speedBonus(3, 5, 20)).toBe(15);
+  });
+
+  it('falls linearly to nothing at the limit', () => {
+    expect(speedBonus(2, 12.5, 20)).toBe(5); // halfway through the sliding part
+    expect(speedBonus(2, 20, 20)).toBe(0);
+    expect(speedBonus(2, 25, 20)).toBe(0);
   });
 });

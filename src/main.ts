@@ -5,12 +5,12 @@ import { startLoop } from './engine/loop';
 import { randomSeed, Rng } from './engine/rng';
 import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
-import { answerText, cardText, isCorrect, pickQuestion, type Question } from './game/questions';
+import { answerText, cardText, mark, pickQuestion, textAnswer, type Question } from './game/questions';
 import { buildBoxArt } from './game/boxArt';
 import { Effects } from './game/effects';
 import { renderWorld, type Art, type ImageKey } from './game/render';
 import { buildScenery } from './game/scenery';
-import { RoundScore } from './game/scoring';
+import { RoundScore, timeLimitFor } from './game/scoring';
 import { World } from './game/world';
 
 import backgroundUrl from './assets/background.png';
@@ -93,13 +93,13 @@ async function main(): Promise<void> {
   const questionText = el('question-text');
   const answerInput = el<HTMLInputElement>('question-answer');
   const feedback = el('question-feedback');
-  /** The open question, and where its box was popped. */
-  let current: { question: Question; level: Level; x: number; y: number } | undefined;
+  /** The open question, where its box was popped, and game-time seconds spent on it. */
+  let current: { question: Question; level: Level; x: number; y: number; seconds: number } | undefined;
 
   const askQuestion = (level: Level, x: number, y: number): void => {
     const question = age === undefined ? undefined : pickQuestion(age, level, rng);
     if (!question) return; // nothing for this age/level yet; keep playing
-    current = { question, level, x, y };
+    current = { question, level, x, y, seconds: 0 };
     playing = false;
     keys.clear();
     const boost = round.nextMultiplier > 1 ? `  — streak ×${round.nextMultiplier}!` : '';
@@ -116,14 +116,16 @@ async function main(): Promise<void> {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!current || answerInput.disabled || answerInput.value.trim() === '') return;
-    const { question, level } = current;
+    const { question, level, seconds } = current;
     answerInput.disabled = true;
-    const right = isCorrect(question, answerInput.value);
-    const result = round.answer(level, right);
+    const { right, spelling } = mark(question, textAnswer(question, answerInput.value));
+    const result = round.answer(level, right, { timing: { seconds, limit: timeLimitFor(age ?? 4) } });
     if (right) {
       effects.celebrate(current.x, current.y, result.points, result.streak);
       const inARow = result.streak >= 3 ? ` — ${result.streak} in a row!` : '';
-      feedback.textContent = `Correct! +${result.points}${inARow}`;
+      const fast = result.speedBonus > 0 ? ' Speedy!' : '';
+      const written = spelling === undefined ? '' : ` It's spelt ${spelling}.`;
+      feedback.textContent = `Correct! +${result.points}${fast}${inARow}${written}`;
       feedback.dataset['result'] = 'good';
     } else {
       feedback.textContent = `The answer was: ${answerText(question)}. ${question.explain}`;
@@ -183,7 +185,9 @@ async function main(): Promise<void> {
 
   startLoop(
     (dt) => {
-      if (!playing || document.hidden) return;
+      if (document.hidden) return;
+      if (current) current.seconds += dt; // the card's clock runs on game time too
+      if (!playing) return;
       const events = world.update(dt, {
         moveRight: keys.isDown('ArrowRight'),
         jump: keys.consume('Space'),

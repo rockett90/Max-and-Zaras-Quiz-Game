@@ -81,6 +81,15 @@ subject × level. Native-speaker review is the bottleneck, not drafting.
   a speed bonus; timing out counts as a miss and shows the answer. Rationale: a
   fixed 10 s fails pre-readers on every question. *(verify: unit tests on the
   limit and bonus functions; play-test with each age)*
+- REQ-PLAY-003 — The speed bonus is +50% of the question's level points when
+  answered in the first quarter of its time limit, falling linearly to nothing at
+  the limit; it is added after the streak multiplier. Time spent reading aloud does
+  not count. Rationale: rewards fluency without punishing a child who stops to read.
+  *(verify: unit tests on the bonus function)*
+- REQ-PLAY-004 — A missed or timed-out question returns once, after two other
+  questions, for half its level points with no speed bonus; a miss on the return
+  is final and goes to the end-of-round review. Rationale: worth retrying, never
+  worth missing on purpose. *(verify: unit tests on the re-ask queue and scoring)*
 - REQ-CONT-002 — Any question containing a blank (`__`) must be multiple choice;
   several words can fit a blank, so a typed answer cannot be marked fairly.
   *(verify: validator rejects it)*
