@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
-Milestone: M2 Question schema + validator
-Next: Adam reviews the 169 draft questions in content/questions/en/ and flips reviewed ones to `status: reviewed` (production builds ship none until then); then delete content/legacy/, log DEC-002 and close M2 with one PR
+Milestone: M2 Question schema + validator — closed (DEC-002), awaiting commit + PR
+Next: Adam commits the M2 close and opens one PR for M1+M2 (`v2/m1-foundations` → main); then a fresh session starts M6 Game feel
 Milestones since review: 1
 
 Tier: 3 System
@@ -27,7 +27,7 @@ bank and rejects seeded bad entries (duplicate, blank without choices, missing
   for the one-text-box card: choices shown in the prompt (shuffled, new
   `Rng.shuffle`), true/false typed, ordering held back until M4; a miss shows
   `explain`. Duplicate check now keys on prompt + options. 61 tests, verify green,
-  play-checked in the dev server. Not yet committed.
+  play-checked in the dev server. Committed (de29ee1).
 - Decision to log at M2 close: REQ-CONT-001 is met by *excluding* drafts from
   production builds, not failing the build on them, so in-progress content never
   blocks a release. Invalid questions do fail the build.
@@ -53,6 +53,8 @@ bank and rejects seeded bad entries (duplicate, blank without choices, missing
 ## Open questions
 
 - None blocking. For credits by M13: which assets did Adam's son draw?
+- Question review deferred: all 169 English questions are `draft`, so a production
+  build ships none. Review before any preview deploy is played (M13 at the latest).
 
 ## Live gotchas
 

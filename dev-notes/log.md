@@ -5,7 +5,38 @@ new one ("DEC-007 supersedes DEC-003 …"). Grep the index, then read single ent
 
 ## Index
 
+- DEC-002 · 2026-10-18 · M2 Question schema — YAML bank, validator, drafts excluded from production
 - DEC-001 · 2026-10-18 · M1 Foundations — Vite + TS rebuild, Cloudflare hosting, speed tuning
+
+---
+
+## DEC-002 · 2026-10-18 · M2 Question schema + validator
+
+**Built:** Question schema and validator (`src/game/questionSchema.ts`): id,
+language, subject, ages 4–11, level 1–3, type (choice / true-false / typed /
+ordering), prompt, answer, choices, `explain`, `strictAccents`, status. Vite plugin
+`build/questionsPlugin.ts` turns `content/questions/**.yaml` into
+`virtual:questions`; an invalid question fails the build. Legacy JSON banks cleaned
+(not ported) into `content/questions/en/`: 125 literacy + 44 numeracy, all `draft`.
+`src/game/questions.ts` reads the virtual module through an interim adapter for the
+one-text-box card. `content/legacy/` deleted (it stays in git history). Verify green:
+typecheck, lint, 61 tests, build.
+
+**Decided:**
+- REQ-CONT-001 is met by *excluding* drafts from production builds, not failing the
+  build on them, so in-progress content never blocks a release. Dev keeps drafts.
+  Rejected failing the build: one unreviewed question would stop every deploy.
+- Legacy cleaning: ~400 disguised sums dropped (M3 generates arithmetic); "Spell the
+  word 'x'" rewritten as pick-the-spelling and now rejected by the validator; `c_t`
+  gaps made multiple choice with a clue; letter sounds dropped until read-aloud (M4).
+- `pickQuestion` falls back to nearest level, then nearest age — legacy coverage
+  stops around age 9 until M10.
+
+**Deviations:** M2 closed with the 169 questions still `draft` — Adam chose to defer
+the review. A production build therefore ships no questions; review is due before
+any public deploy (M13 at the latest, sooner if a preview deploy is played).
+
+**Dead-ends:** none new.
 
 ---
 

@@ -50,5 +50,6 @@ from M2). Stops at the first failure.
 - Logical playfield is 1024×768, letterboxed to fit any screen.
 - Randomness goes through the seeded RNG in `src/engine/rng.ts` (Daily Challenge
   depends on reproducible rounds).
-- `content/legacy/` holds the original English JSON banks until M2 migrates them.
+- Questions live in `content/questions/<lang>/*.yaml` (schema:
+  `src/game/questionSchema.ts`). Only `status: reviewed` ships in production.
 - Adam drives commits: stage and offer, never commit or push unprompted.
