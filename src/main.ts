@@ -6,7 +6,8 @@ import { randomSeed, Rng } from './engine/rng';
 import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
 import { answerText, cardText, isCorrect, pickQuestion, type Question } from './game/questions';
-import { renderWorld, type ImageKey } from './game/render';
+import { buildBoxArt } from './game/boxArt';
+import { renderWorld, type Art, type ImageKey } from './game/render';
 import { buildScenery } from './game/scenery';
 import { RoundScore } from './game/scoring';
 import { World } from './game/world';
@@ -53,7 +54,7 @@ async function main(): Promise<void> {
     box: boxUrl,
     bubble: bubbleUrl,
   });
-  const scenery = buildScenery(images.background);
+  const art: Art = { images, scenery: buildScenery(images.background), boxes: buildBoxArt(images.box) };
   const music = new Music(musicUrl, 0.4);
   const sfx = { jump: new Sound(jumpSfxUrl, 0.7), bubble: new Sound(bubbleSfxUrl, 0.7) };
   const keys = new Keyboard(window, new Set(['ArrowRight', 'ArrowUp', 'Space']));
@@ -187,7 +188,7 @@ async function main(): Promise<void> {
         else endRound();
       }
     },
-    () => renderWorld(ctx, world, round, images, scenery),
+    () => renderWorld(ctx, world, round, art),
   );
 
   show('splash');

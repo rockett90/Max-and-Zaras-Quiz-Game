@@ -1,7 +1,7 @@
 # Max and Zara's Quiz Game — state
 
-Milestone: M6 Game feel (in progress, 6a–6b done)
-Next: 6c box per level. Push/PR of `v2/m1-foundations` is on hold (Adam, 2026-10-18).
+Milestone: M6 Game feel (in progress, 6a–6c done)
+Next: 6d particles. Push/PR of `v2/m1-foundations` is on hold (Adam, 2026-10-18).
 Milestones since review: 2
 
 Tier: 3 System
@@ -19,8 +19,9 @@ M6 plan (approved 2026-10-18). Work inline; every step touches `render.ts`.
 - [x] 6b `src/engine/parallax.ts` + `src/game/scenery.ts`: background mirror-tiled
   and split at y=645 (water 0.2×, sand 1× with water pixels keyed out), code-drawn
   reefs at 0.3× and 0.45×, light beams breathing on `world.elapsed`. File untouched.
-- [ ] 6c Box per level: tinted copies of box1 made at load (wood / sea-green + shell /
-  gold + shimmer), and 1–3 star pips replace the number.
+- [x] 6c `src/game/boxArt.ts`: box1 copies tinted at load (multiply + screen, cut
+  back to the outline): wood / sea-green with a code-drawn shell / amber-gold with a
+  shimmer sweep. 1–3 star pips replace the number. Render takes one `Art` bundle.
 - [ ] 6d `src/engine/particles.ts` with its own cosmetic RNG (never the round RNG;
   Daily Challenge). Box splinters, bubble trail, landing puff, correct-answer
   sparkle and "+N" pop, ambient plankton. Thinned under reduced motion.

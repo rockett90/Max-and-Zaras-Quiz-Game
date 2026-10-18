@@ -1,4 +1,5 @@
 import type { ImageSet } from '../engine/assets';
+import { drawBox, type BoxArt } from './boxArt';
 import { WORLD_WIDTH } from './config';
 import { drawScenery, type Scenery } from './scenery';
 import type { RoundScore } from './scoring';
@@ -8,33 +9,22 @@ export type ImageKey = 'background' | 'crab' | 'rock' | 'seaweed' | 'box' | 'bub
 
 const HUD_FONT = 'bold 34px "Trebuchet MS", "Segoe UI", sans-serif';
 
-export function renderWorld(
-  ctx: CanvasRenderingContext2D,
-  world: World,
-  round: RoundScore,
-  images: ImageSet<ImageKey>,
-  scenery: Scenery,
-): void {
-  drawScenery(ctx, scenery, world.distance, world.elapsed);
+/** Everything drawn, loaded or prepared once before play. */
+export interface Art {
+  images: ImageSet<ImageKey>;
+  scenery: Scenery;
+  boxes: BoxArt;
+}
+
+export function renderWorld(ctx: CanvasRenderingContext2D, world: World, round: RoundScore, art: Art): void {
+  const { images } = art;
+  drawScenery(ctx, art.scenery, world.distance, world.elapsed);
 
   for (const ob of world.obstacles) {
     ctx.drawImage(images[ob.kind], ob.x, ob.y, ob.width, ob.height);
   }
 
-  for (const box of world.boxes) {
-    ctx.drawImage(images.box, box.x, box.y, box.width, box.height);
-    ctx.save();
-    ctx.fillStyle = '#fff';
-    ctx.font = HUD_FONT;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.6)';
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.shadowBlur = 4;
-    ctx.fillText(String(box.level), box.x + box.width / 2, box.y + box.height / 2);
-    ctx.restore();
-  }
+  for (const box of world.boxes) drawBox(ctx, art.boxes, box, world.elapsed);
 
   const { crab } = world;
   ctx.drawImage(images.crab, crab.x, crab.y, crab.width, crab.height);
