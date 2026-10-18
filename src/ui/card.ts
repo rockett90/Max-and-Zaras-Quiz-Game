@@ -2,7 +2,9 @@
  * The question card: plain DOM over the paused game. Builds the answer controls for
  * each question type, runs the per-question timer on game time (fed through
  * `tick`), and hands back an Answer — or nothing when time runs out. Marking and
- * scoring stay with the caller; the card only shows the result it is told.
+ * scoring stay with the caller; the card only shows the result it is told. After a
+ * right answer it moves on by itself; after a miss it waits for Continue, so there
+ * is time to read the explanation.
  */
 import type { Rng } from '../engine/rng';
 import { mark, type Answer, type Question } from '../game/questions';
@@ -10,6 +12,9 @@ import { OrderingPicker } from './ordering';
 
 /** Under this share of the time left, the bar turns to its warning colour. */
 const WARN_SHARE = 0.25;
+
+/** Game-time seconds a right answer stays on screen before play resumes. */
+const RIGHT_HOLD_SECONDS = 1.4;
 
 export interface Submission {
   /** Undefined when the time ran out. */
@@ -40,6 +45,7 @@ export class QuestionCard {
   private readonly text: HTMLElement;
   private readonly answers: HTMLElement;
   private readonly feedback: HTMLElement;
+  private readonly continueButton: HTMLElement;
 
   private question: Question | undefined;
   private limit = 0;
@@ -49,10 +55,14 @@ export class QuestionCard {
   private options: { button: HTMLButtonElement; answer: Answer; key: string }[] = [];
   private input: HTMLInputElement | undefined;
   private ordering: OrderingPicker | undefined;
+  /** Seconds left before a right answer moves on; undefined when not counting. */
+  private hold: number | undefined;
+  private awaitingContinue = false;
 
   constructor(
     form: HTMLFormElement,
     private readonly onSubmit: (submission: Submission) => void,
+    private readonly onContinue: () => void,
   ) {
     const part = (selector: string): HTMLElement => {
       const found = form.querySelector<HTMLElement>(selector);
@@ -65,6 +75,8 @@ export class QuestionCard {
     this.text = part('.card__text');
     this.answers = part('.card__answers');
     this.feedback = part('.card__feedback');
+    this.continueButton = part('.card__continue');
+    this.continueButton.addEventListener('click', () => this.finish());
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -73,6 +85,11 @@ export class QuestionCard {
       if (order) this.submit({ type: 'ordering', order });
     });
     window.addEventListener('keydown', (e) => {
+      if (this.awaitingContinue && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        this.finish();
+        return;
+      }
       if (this.locked || e.target instanceof HTMLInputElement) return;
       if (this.ordering) {
         this.orderingKey(e, this.ordering);
@@ -101,6 +118,9 @@ export class QuestionCard {
     this.options = [];
     this.input = undefined;
     this.ordering = undefined;
+    this.hold = undefined;
+    this.awaitingContinue = false;
+    this.continueButton.hidden = true;
 
     switch (question.type) {
       case 'choice':
@@ -145,24 +165,44 @@ export class QuestionCard {
 
   /** Advances the question clock by `dt` game-time seconds; times out at the limit. */
   tick(dt: number): void {
+    if (this.hold !== undefined) {
+      this.hold -= dt;
+      if (this.hold <= 0) this.finish();
+    }
     if (this.locked) return;
     this.seconds = Math.min(this.seconds + dt, this.limit);
     this.drawTimer();
     if (this.seconds >= this.limit) this.lock(undefined);
   }
 
-  /** Shows the marked result: the right option in green, a wrong pick in red. */
+  /**
+   * Shows the marked result: the right option in green, a wrong pick in red. Then
+   * moves on by itself after a right answer, or waits for Continue after a miss.
+   */
   showResult(message: string, right: boolean, given: Answer | undefined): void {
     this.feedback.textContent = message;
     this.feedback.dataset['result'] = right ? 'good' : 'bad';
     const question = this.question;
-    if (!question) return;
     for (const option of this.options) {
-      if (mark(question, option.answer).right) option.button.dataset['result'] = 'good';
+      if (question && mark(question, option.answer).right) option.button.dataset['result'] = 'good';
       else if (option.answer === given) option.button.dataset['result'] = 'bad';
     }
     if (this.input) this.input.dataset['result'] = right ? 'good' : 'bad';
-    if (this.ordering && question.type === 'ordering') this.ordering.reveal(question.answer);
+    if (this.ordering && question?.type === 'ordering') this.ordering.reveal(question.answer);
+    if (right) {
+      this.hold = RIGHT_HOLD_SECONDS;
+    } else {
+      this.awaitingContinue = true;
+      this.continueButton.hidden = false;
+      this.continueButton.focus();
+    }
+  }
+
+  private finish(): void {
+    this.hold = undefined;
+    this.awaitingContinue = false;
+    this.continueButton.hidden = true;
+    this.onContinue();
   }
 
   /** Keys 1–6 place tiles, Backspace takes the last one back, Enter checks once full. */

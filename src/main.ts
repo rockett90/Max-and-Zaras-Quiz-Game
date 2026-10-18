@@ -10,9 +10,10 @@ import { buildBoxArt } from './game/boxArt';
 import { Effects } from './game/effects';
 import { renderWorld, type Art, type ImageKey } from './game/render';
 import { buildScenery } from './game/scenery';
-import { RoundScore, timeLimitFor } from './game/scoring';
+import { ReaskQueue, type Missed } from './game/reask';
+import { RETRY_SHARE, RoundScore, timeLimitFor } from './game/scoring';
 import { World } from './game/world';
-import { QuestionCard } from './ui/card';
+import { QuestionCard, type Submission } from './ui/card';
 
 import backgroundUrl from './assets/background.png';
 import boxUrl from './assets/box1.png';
@@ -25,7 +26,6 @@ import bubbleSfxUrl from './assets/bubble.mp3';
 import jumpSfxUrl from './assets/jump.mp3';
 
 const AGES = [4, 5, 6, 7, 8, 9, 10, 11] as const;
-const FEEDBACK_SECONDS = 1.4;
 
 type ScreenId = 'loading' | 'splash' | 'setup' | 'question' | 'results';
 
@@ -65,6 +65,7 @@ async function main(): Promise<void> {
   let rng = new Rng(randomSeed());
   let world = new World(rng);
   let round = new RoundScore();
+  let reask = new ReaskQueue();
   // Effects get their own RNG so they never shift what the round's RNG draws next.
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const newEffects = (): Effects => new Effects(new Rng(randomSeed()), reducedMotion.matches);
@@ -89,47 +90,53 @@ async function main(): Promise<void> {
   }
 
   // --- Question card ------------------------------------------------------
-  /** The open question and where its box was popped. */
-  let current: { question: Question; level: Level; limit: number; x: number; y: number } | undefined;
+  /** The open question, where its box was popped, and its miss when this is a second go. */
+  let current: { question: Question; level: Level; limit: number; x: number; y: number; retry: Missed | undefined } | undefined;
 
-  const card = new QuestionCard(el<HTMLFormElement>('question-form'), ({ answer, seconds }) => {
+  const onSubmit = ({ answer, seconds }: Submission): void => {
     if (!current) return;
-    const { question, level, limit } = current;
+    const { question, level, limit, retry } = current;
     const { right, spelling } = answer ? mark(question, answer) : { right: false, spelling: undefined };
-    const result = round.answer(level, right, { timing: { seconds, limit } });
+    const result = round.answer(level, right, { timing: { seconds, limit }, retry: retry !== undefined });
+    reask.answered(question, level, right, retry);
     let message: string;
     if (right) {
       effects.celebrate(current.x, current.y, result.points, result.streak);
       const inARow = result.streak >= 3 ? ` — ${result.streak} in a row!` : '';
       const fast = result.speedBonus > 0 ? ' Speedy!' : '';
       const written = spelling === undefined ? '' : ` It's spelt ${spelling}.`;
-      message = `Correct! +${result.points}${fast}${inARow}${written}`;
+      message = `${retry ? 'Got it this time!' : 'Correct!'} +${result.points}${fast}${inARow}${written}`;
     } else {
       const lead = answer ? '' : "Time's up! ";
       message = `${lead}The answer was: ${answerText(question)}. ${question.explain}`;
     }
     card.showResult(message, right, answer);
     current = undefined;
-    window.setTimeout(() => {
-      show();
-      playing = true;
-    }, FEEDBACK_SECONDS * 1000);
+  };
+  const card = new QuestionCard(el<HTMLFormElement>('question-form'), onSubmit, () => {
+    show();
+    playing = true;
   });
 
   // Dev builds only: ?type=true-false (etc.) asks only that type, to test each card.
   const devType = import.meta.env.DEV ? new URLSearchParams(location.search).get('type') : null;
   const devQuestions = PLAYABLE.filter((q) => q.type === devType);
 
-  const askQuestion = (level: Level, x: number, y: number): void => {
+  const askQuestion = (boxLevel: Level, x: number, y: number): void => {
     if (age === undefined) return;
-    const question = devQuestions.length > 0 ? pickQuestion(age, level, rng, devQuestions, 0) : pickQuestion(age, level, rng);
+    // A missed question that is due comes back in place of a fresh one, at its own level.
+    const retry = reask.due();
+    const question = retry?.question ?? (devQuestions.length > 0 ? pickQuestion(age, boxLevel, rng, devQuestions, 0) : pickQuestion(age, boxLevel, rng));
     if (!question) return; // nothing for this age/level yet; keep playing
+    const level = retry?.level ?? boxLevel;
     const limit = timeLimitFor(age);
-    current = { question, level, limit, x, y };
+    current = { question, level, limit, x, y, retry };
     playing = false;
     keys.clear();
+    const points = level * POINTS_PER_LEVEL * (retry ? RETRY_SHARE : 1);
     const boost = round.nextMultiplier > 1 ? `  — streak ×${round.nextMultiplier}!` : '';
-    card.open(question, `${'★'.repeat(level)}  ${level * POINTS_PER_LEVEL} points${boost}`, limit, rng);
+    const header = `${retry ? 'Second go!  ' : ''}${'★'.repeat(level)}  ${points} points${boost}`;
+    card.open(question, header, limit, rng);
     show('question');
     card.focus();
   };
@@ -139,6 +146,7 @@ async function main(): Promise<void> {
     rng = new Rng(randomSeed());
     world = new World(rng);
     round = new RoundScore();
+    reask = new ReaskQueue();
     effects = newEffects();
     keys.clear();
     show();
