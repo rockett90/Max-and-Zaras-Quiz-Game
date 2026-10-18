@@ -1,0 +1,61 @@
+import type { ImageSet } from '../engine/assets';
+import { WORLD_HEIGHT, WORLD_WIDTH } from './config';
+import type { World } from './world';
+
+export type ImageKey = 'background' | 'crab' | 'rock' | 'seaweed' | 'box' | 'bubble';
+
+const HUD_FONT = 'bold 34px "Trebuchet MS", "Segoe UI", sans-serif';
+
+export function renderWorld(ctx: CanvasRenderingContext2D, world: World, images: ImageSet<ImageKey>): void {
+  ctx.drawImage(images.background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+  for (const ob of world.obstacles) {
+    ctx.drawImage(images[ob.kind], ob.x, ob.y, ob.width, ob.height);
+  }
+
+  for (const box of world.boxes) {
+    ctx.drawImage(images.box, box.x, box.y, box.width, box.height);
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.font = HUD_FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.shadowBlur = 4;
+    ctx.fillText(String(box.level), box.x + box.width / 2, box.y + box.height / 2);
+    ctx.restore();
+  }
+
+  const { crab } = world;
+  ctx.drawImage(images.crab, crab.x, crab.y, crab.width, crab.height);
+
+  for (const b of world.bubbles) {
+    ctx.drawImage(images.bubble, b.x - b.radius, b.y - b.radius, b.radius * 2, b.radius * 2);
+  }
+
+  drawHud(ctx, world);
+}
+
+function drawHud(ctx: CanvasRenderingContext2D, world: World): void {
+  pill(ctx, 12, 12, `Score: ${world.score}`, 'left');
+  pill(ctx, WORLD_WIDTH - 12, 12, `Time: ${Math.ceil(world.timeLeft)}`, 'right');
+}
+
+function pill(ctx: CanvasRenderingContext2D, x: number, y: number, text: string, align: 'left' | 'right'): void {
+  ctx.save();
+  ctx.font = HUD_FONT;
+  const padX = 14;
+  const height = 50;
+  const width = ctx.measureText(text).width + padX * 2;
+  const left = align === 'left' ? x : x - width;
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.beginPath();
+  ctx.roundRect(left, y, width, height, 12);
+  ctx.fill();
+  ctx.fillStyle = '#123';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, left + padX, y + height / 2 + 1);
+  ctx.restore();
+}
