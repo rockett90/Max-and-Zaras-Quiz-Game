@@ -46,7 +46,7 @@ translation questions between a child's languages.
 | M1 | Foundations: Vite + TS, fixed-timestep loop, asset preloader, scaling canvas, `pnpm verify` | Current gameplay runs with flicker, frame-rate speed and list-splice bugs fixed; verify green | done 2026-10-18 (DEC-001) |
 | M2 | Question schema + validator; YAML→JSON build; cleaned English banks migrated | Validator passes the cleaned bank and rejects seeded bad entries | done 2026-10-18 (DEC-002) |
 | M3 | Procedural maths generators per age/level | Tests prove every generator's output range by age and level | done 2026-10-18 (DEC-004) |
-| M4 | Question card: choice, true/false, typed, ordering; per-question timer with speed bonus; explanations, second chance, end-of-round review; read-aloud | Playable round exercising every answer type | |
+| M4 | Question card: choice, true/false, typed, ordering; per-question timer with speed bonus; explanations, second chance, end-of-round review; read-aloud | Playable round exercising every answer type | done 2026-10-22 (DEC-005) |
 | M15 | Games monorepo: merge `v2/m1-foundations` to `main`; rename the repo `games` (all lowercase); `git mv` this game into `games/quiz/`; pnpm workspace; Astro hub site at `/`; one Pages build serving the hub and the game; `pnpm verify` across the workspace | Verify green across the workspace; a preview deploy serves the hub at `/` and the game at its path; `git log --follow` traces moved files | |
 | M5 | Menus + touch: language → nickname → age → subjects → play; translated UI strings | Full flow on a tablet-sized viewport, touch only | |
 | M6 | Game feel: parallax, distinct box art per level, particles, streaks, results stars | Side-by-side play against the M1 build | done 2026-10-18 (DEC-003) |

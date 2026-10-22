@@ -18,16 +18,19 @@ export type { Question };
 /** Every bank question; each type has a card to show it on. */
 export const PLAYABLE: readonly Question[] = bank;
 
-/** Age gaps outweigh level gaps when the bank has nothing exact. */
-const AGE_WEIGHT = 10;
+function ageGap(q: Question, age: number): number {
+  return age < q.ages.min ? q.ages.min - age : age > q.ages.max ? age - q.ages.max : 0;
+}
 
-function distance(q: Question, age: number, level: Level): number {
-  const ageGap = age < q.ages.min ? q.ages.min - age : age > q.ages.max ? age - q.ages.max : 0;
-  return ageGap * AGE_WEIGHT + Math.abs(q.level - level);
+function levelGap(q: Question, level: Level): number {
+  return Math.abs(q.level - level);
 }
 
 /** Share of numeracy picks that are a generated sum rather than from the bank. */
 export const GENERATED_SHARE = 0.5;
+
+/** Extra draws for a generated sum that was already asked this round. */
+const SUM_REDRAWS = 5;
 
 /**
  * A question for this age and level. Picks a subject first so a large literacy bank
@@ -38,18 +41,36 @@ export const GENERATED_SHARE = 0.5;
  * Numeracy is always on offer while `generatedShare` is above zero: a share of its
  * picks are generated sums, and all of them are when the bank has no numeracy (a
  * production build before review).
+ *
+ * Questions whose ids are in `asked` are skipped while the subject has others for
+ * this age, even at a further level; repeats come back only once all are used.
+ * A generated sum that was asked is redrawn a few times.
  */
-export function pickQuestion(age: number, level: Level, rng: Rng, questions: readonly Question[] = PLAYABLE, generatedShare = GENERATED_SHARE): Question | undefined {
+export function pickQuestion(
+  age: number,
+  level: Level,
+  rng: Rng,
+  questions: readonly Question[] = PLAYABLE,
+  generatedShare = GENERATED_SHARE,
+  asked: ReadonlySet<string> = new Set(),
+): Question | undefined {
   const subjects = new Set(questions.map((q) => q.subject));
   if (generatedShare > 0) subjects.add('numeracy');
   if (subjects.size === 0) return undefined;
   const subject = rng.pick([...subjects].sort());
   const inSubject = questions.filter((q) => q.subject === subject);
   if (subject === 'numeracy' && generatedShare > 0 && (inSubject.length === 0 || rng.chance(generatedShare))) {
-    return generateQuestion(age, level, rng);
+    // A few redraws, since the youngest ages have only a handful of sums.
+    let sum = generateQuestion(age, level, rng);
+    for (let i = 0; i < SUM_REDRAWS && asked.has(sum.id); i++) sum = generateQuestion(age, level, rng);
+    return sum;
   }
-  const best = Math.min(...inSubject.map((q) => distance(q, age, level)));
-  return rng.pick(inSubject.filter((q) => distance(q, age, level) === best));
+  const nearestAge = Math.min(...inSubject.map((q) => ageGap(q, age)));
+  const forAge = inSubject.filter((q) => ageGap(q, age) === nearestAge);
+  const fresh = forAge.filter((q) => !asked.has(q.id));
+  const pool = fresh.length > 0 ? fresh : forAge;
+  const nearestLevel = Math.min(...pool.map((q) => levelGap(q, level)));
+  return rng.pick(pool.filter((q) => levelGap(q, level) === nearestLevel));
 }
 
 /** The correct answer as written, for feedback after a miss. */

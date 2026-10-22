@@ -27,6 +27,40 @@ describe('pickQuestion', () => {
     expect(pickQuestion(10, 2, rng, [q('age-7', [4, 7], 2), q('age-9', [8, 9], 1)], 0)?.id).toBe('age-9');
   });
 
+  it('skips questions already asked this round until the age has none left', () => {
+    const bank = [q('a', [6, 6], 2), q('b', [6, 6], 2), q('level-off', [6, 6], 3), q('age-off', [7, 8], 2)];
+    const rng = new Rng(2);
+    const asked = new Set<string>();
+    const picks = Array.from({ length: 3 }, () => {
+      const id = pickQuestion(6, 2, rng, bank, 0, asked)?.id ?? '';
+      asked.add(id);
+      return id;
+    });
+    // Both exact matches first, then a fresh question a level away before any repeat.
+    expect(new Set(picks.slice(0, 2))).toEqual(new Set(['a', 'b']));
+    expect(picks[2]).toBe('level-off');
+    // A question for another age is never preferred over a repeat; repeats start at the nearest level.
+    asked.add('level-off');
+    for (let i = 0; i < 20; i++) expect(['a', 'b']).toContain(pickQuestion(6, 2, rng, bank, 0, asked)?.id);
+  });
+
+  it('redraws a generated sum that was already asked', () => {
+    // Age 4 level 1 has 10 sums: six plain draws repeat in about 85% of rounds.
+    let roundsWithRepeat = 0;
+    for (let seed = 1; seed <= 200; seed++) {
+      const rng = new Rng(seed);
+      const asked = new Set<string>();
+      let repeated = false;
+      for (let i = 0; i < 6; i++) {
+        const id = pickQuestion(4, 1, rng, [], 1, asked)?.id ?? '';
+        repeated ||= asked.has(id);
+        asked.add(id);
+      }
+      if (repeated) roundsWithRepeat++;
+    }
+    expect(roundsWithRepeat).toBeLessThan(20);
+  });
+
   it('gives each subject a fair share however big its bank', () => {
     const bank = [...Array.from({ length: 50 }, (_, i) => q(`lit-${i}`, [4, 11], 1)), q('num', [4, 11], 1, 'numeracy')];
     const rng = new Rng(3);

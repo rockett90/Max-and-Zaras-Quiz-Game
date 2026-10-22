@@ -5,10 +5,51 @@ new one ("DEC-007 supersedes DEC-003 …"). Grep the index, then read single ent
 
 ## Index
 
+- DEC-005 · 2026-10-22 · M4 Question card — four answer cards, game-time timer + speed bonus, second go, review, read-aloud; no in-round repeats
 - DEC-004 · 2026-10-18 · M3 Maths generators — symbol-only sums per age × level, 50/50 with bank numeracy, choice for ages 4–5
 - DEC-003 · 2026-10-18 · M6 Game feel — streak scoring, stars, parallax, box tints, particles; own RNG for effects
 - DEC-002 · 2026-10-18 · M2 Question schema — YAML bank, validator, drafts excluded from production
 - DEC-001 · 2026-10-18 · M1 Foundations — Vite + TS rebuild, Cloudflare hosting, speed tuning
+
+---
+
+## DEC-005 · 2026-10-22 · M4 Question card
+
+**Built:** `src/ui/card.ts`, the DOM question card, with choice (keys 1–4),
+True/False (T/F), typed, and tap-in-order ordering (`src/ui/ordering.ts`, keys 1–6,
+Backspace, Enter). A timer bar runs on game time through `tick()`, and running out
+counts as a miss. Scoring (`src/game/scoring.ts`) gained per-age time limits
+(20/15/10 s, REQ-PLAY-002) and a speed bonus of up to half the level points, added
+after the streak multiplier (REQ-PLAY-003). `src/game/reask.ts` brings a miss back
+once, after two other questions, as a "Second go!" for half points with no bonus
+(REQ-PLAY-004). After a miss the card waits for Continue; after a right answer it
+moves on after 1.4 s of game time. `src/ui/review.ts` adds "Let's look again" to
+results. `src/engine/speech.ts` reads the question aloud with a UK voice when one
+exists, and the clock stands still while it speaks. `mark()` takes an `Answer` per
+card; typed answers missing accents score and show the spelling (REQ-ANS-001).
+`pickQuestion` gained `asked` so a round does not repeat itself. Commits c52b8a5,
+5f80e91, 446771f, 641954f, f989e42, f839101, plus the repeat fix. Verify green:
+153 tests, build.
+
+**Decided:**
+- Questions asked this round are skipped while the subject has others for the
+  child's age, even at a further level. Repeats return only when the age's pool is
+  used up. Generated sums redraw up to 5 times (`SUM_REDRAWS`), because age 4 L1
+  has only 10 sums. Without asked ids, the draws match the old picker exactly.
+- Ordering is marked per slot after a miss, and the feedback gives the full order.
+- Dev builds only: `?type=<question type>` asks just that type.
+
+**Deviations:** the repeat fix came from the M4 play-test, not the plan. Before it,
+50–64% of rounds at ages 4–6 and 99% at ages 9–11 repeated a question (1,000
+simulated 12-question rounds), and the review listed repeats twice. After it, there
+were none at ages 5–6. Repeats left at ages 7–11 come from thin bank content (age 7
+has 3 numeracy questions, ages 9–11 almost none), which M10 fixes.
+
+**Dead-ends:** the built-in browser pane runs at about 1.5 fps, so play-testing
+there is too slow to reach boxes. Overriding `requestAnimationFrame` with a 16 ms
+`setTimeout` in the page console makes it playable. `javascript_tool` calls over
+45 s time out and may run twice, so keep each call short and guard it with a busy
+flag.
 
 ---
 

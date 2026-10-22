@@ -6,7 +6,7 @@ import { randomSeed, Rng } from './engine/rng';
 import { Speech } from './engine/speech';
 import { fitStage } from './engine/viewport';
 import { POINTS_PER_LEVEL, WORLD_HEIGHT, WORLD_WIDTH, type Level } from './game/config';
-import { answerText, mark, pickQuestion, PLAYABLE, type Question } from './game/questions';
+import { answerText, GENERATED_SHARE, mark, pickQuestion, PLAYABLE, type Question } from './game/questions';
 import { buildBoxArt } from './game/boxArt';
 import { Effects } from './game/effects';
 import { renderWorld, type Art, type ImageKey } from './game/render';
@@ -69,6 +69,8 @@ async function main(): Promise<void> {
   let world = new World(rng);
   let round = new RoundScore();
   let reask = new ReaskQueue();
+  /** Ids asked so far this round, so fresh picks avoid repeats. */
+  let asked = new Set<string>();
   // Effects get their own RNG so they never shift what the round's RNG draws next.
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const newEffects = (): Effects => new Effects(new Rng(randomSeed()), reducedMotion.matches);
@@ -134,8 +136,11 @@ async function main(): Promise<void> {
     if (age === undefined) return;
     // A missed question that is due comes back in place of a fresh one, at its own level.
     const retry = reask.due();
-    const question = retry?.question ?? (devQuestions.length > 0 ? pickQuestion(age, boxLevel, rng, devQuestions, 0) : pickQuestion(age, boxLevel, rng));
+    const question =
+      retry?.question ??
+      (devQuestions.length > 0 ? pickQuestion(age, boxLevel, rng, devQuestions, 0, asked) : pickQuestion(age, boxLevel, rng, PLAYABLE, GENERATED_SHARE, asked));
     if (!question) return; // nothing for this age/level yet; keep playing
+    asked.add(question.id);
     const level = retry?.level ?? boxLevel;
     const limit = timeLimitFor(age);
     current = { question, level, limit, x, y, retry };
@@ -155,6 +160,7 @@ async function main(): Promise<void> {
     world = new World(rng);
     round = new RoundScore();
     reask = new ReaskQueue();
+    asked = new Set();
     effects = newEffects();
     keys.clear();
     show();
