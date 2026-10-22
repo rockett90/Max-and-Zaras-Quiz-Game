@@ -22,7 +22,7 @@ TypeScript + Vite static frontend; touch and keyboard; scales to any screen;
 translated UI in all five languages; local profiles and personal bests; a small
 leaderboard server (API + SQLite); a Daily Challenge; three subjects × ages 4–11 ×
 three levels × five languages; game feel (parallax, particles, streak bonus,
-end-of-round stars). Learning loop (added 2026-10-18): an explanation on every wrong
+end-of-round stars); a small Astro hub site listing the games. Learning loop (added 2026-10-18): an explanation on every wrong
 answer, missed questions return once later in the same round, and an end-of-round
 review of what was missed. Bilingual mode: questions shown in two languages, plus
 translation questions between a child's languages.
@@ -47,19 +47,21 @@ translation questions between a child's languages.
 | M2 | Question schema + validator; YAML→JSON build; cleaned English banks migrated | Validator passes the cleaned bank and rejects seeded bad entries | done 2026-10-18 (DEC-002) |
 | M3 | Procedural maths generators per age/level | Tests prove every generator's output range by age and level | done 2026-10-18 (DEC-004) |
 | M4 | Question card: choice, true/false, typed, ordering; per-question timer with speed bonus; explanations, second chance, end-of-round review; read-aloud | Playable round exercising every answer type | |
+| M15 | Games monorepo: merge `v2/m1-foundations` to `main`; rename the repo `games` (all lowercase); `git mv` this game into `games/quiz/`; pnpm workspace; Astro hub site at `/`; one Pages build serving the hub and the game; `pnpm verify` across the workspace | Verify green across the workspace; a preview deploy serves the hub at `/` and the game at its path; `git log --follow` traces moved files | |
 | M5 | Menus + touch: language → nickname → age → subjects → play; translated UI strings | Full flow on a tablet-sized viewport, touch only | |
 | M6 | Game feel: parallax, distinct box art per level, particles, streaks, results stars | Side-by-side play against the M1 build | done 2026-10-18 (DEC-003) |
 | M7 | Local profiles and personal bests | Scores persist across reloads per profile | |
-| M8 | Leaderboard API: Pages Functions + D1, rate limits, score plausibility, name word lists | API tests pass locally (wrangler) and on a preview deploy | |
+| M8 | Leaderboard API: Pages Functions at `/api/quiz/*` + D1, rate limits, score plausibility, name word lists | API tests pass locally (wrangler) and on a preview deploy | |
 | M9 | Leaderboard client, Daily Challenge, privacy page | Two devices see each other's scores; offline play still works | |
 | M10 | English content: literacy + science, ages 4–11, levels 1–3 | Every age/subject/level combination meets its minimum count | |
 | M11 | Spanish + Romanian content, native-reviewed | Validator reports 0 unreviewed questions live | |
 | M12 | French + Italian content, native-reviewed | As M11 | |
 | M14 | Bilingual mode: dual-language question display and translation questions for en↔es, en↔ro | Playable bilingual round for each pair; validator checks translation pairs | |
-| M13 | Release: games.teamrockett.co.uk live (old /Quiz_Game path redirects), README, contributor guide | Release check passes on desktop and tablet | |
+| M13 | Release: the game live at its path on games.teamrockett.co.uk (old /Quiz_Game path redirects), README, contributor guide | Release check passes on desktop and tablet | |
 
 **Build order** (IDs are frozen; order changed 2026-10-18 so play-testing with the
-kids is fun earlier): M1 → M2 → M6 → M3 → M4 → M5 → M7 → M8 → M9 → M10 → M11 →
+kids is fun earlier; M15 added 2026-10-22 so the URL layout is fixed before the
+leaderboard API): M1 → M2 → M6 → M3 → M4 → M15 → M5 → M7 → M8 → M9 → M10 → M11 →
 M14 → M12 → M13.
 
 Content (M10–M12) is the long pole; minimum 20 hand-written questions per age ×
@@ -114,13 +116,27 @@ subject × level. Native-speaker review is the bottleneck, not drafting.
 - **Fixed-timestep engine** (`src/engine/`) separated from game rules (`src/game/`),
   with a seeded RNG so a Daily Challenge round is reproducible for everyone.
 - **Hosting is Cloudflare** (decided 2026-10-18; teamrockett.co.uk DNS is already on
-  Cloudflare). The game is a Cloudflare Pages site built from the GitHub repo on
-  every push to `main`, on the custom domain games.teamrockett.co.uk. The
-  leaderboard is a Pages Function at `/api/*` on the same domain (same origin, so no
-  CORS) backed by a Cloudflare D1 (SQLite) database. Pull requests get automatic
-  preview URLs. Rejected: a VPS running Node (a server to patch and back up, for a
-  few requests a day) and a separate API subdomain (adds CORS and a second deploy).
+  Cloudflare; revised 2026-10-22 for the monorepo). One Cloudflare Pages project
+  is built from the GitHub repo on every push to `main`, on the custom domain
+  games.teamrockett.co.uk. An Astro hub site is served at `/`, and each game's Vite
+  build is copied into its own path (this game: `/quiz/` unless renamed, see open
+  questions). The relative Vite `base` already lets the game work from any path.
+  Each game's leaderboard is a Pages Function under `/api/<game>/*`, so this one
+  uses `/api/quiz/*`. It is on the same origin, so there is no CORS, and it is
+  backed by a Cloudflare D1 (SQLite) database. Pull requests get automatic preview
+  URLs. Rejected: a VPS running Node (a server to patch and back up, for a few
+  requests a day); a separate API subdomain (adds CORS and a second deploy); a
+  Pages project or subdomain per game (more deploys and origins for no gain).
   Free tier covers expected traffic.
+- **Games monorepo** (decided 2026-10-22, built in M15). Adam plans more games, so
+  the repo becomes `games`: a pnpm workspace with `site/` (Astro hub),
+  `games/<slug>/` per game and `functions/api/<slug>/` per leaderboard. History is
+  kept by renaming this repo and `git mv`-ing into `games/quiz/`, not by starting a
+  new repo. The engine stays inside this game until a second game needs it, then
+  moves to `packages/engine`. The existing rule that engine code never imports from
+  `src/game/` keeps that move cheap. Rejected: one repo per game (duplicated
+  tooling, and the hub would need to pull from several repos to build) and
+  extracting the engine now (a package with only one user).
 
 Delegation: content drafting per language (M10–M12) runs in parallel sessions once
 the M2 schema is frozen; engine and gameplay work stays inline.
@@ -139,3 +155,5 @@ the M2 schema is frozen; engine and gameplay work stays inline.
 
 1. Which assets did Adam's son draw? (The rock with starfish is clearly his.) Needed
    for credits by M13.
+2. The game's path on games.teamrockett.co.uk: `/quiz/` or `/max-and-zara/`? Also
+   sets the workspace folder and the `/api/<slug>/` prefix. Needed by M15.
